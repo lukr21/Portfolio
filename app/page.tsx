@@ -21,6 +21,11 @@ export default function HomePage() {
           />
           <div className="hero__grid" />
           <div className="hero__content">
+            <img
+              src="/assets/img/portfolio-headshot.jpg"
+              alt="Lucas Krippendorff"
+              className="hero__avatar compile-el"
+            />
             <h1 className="hero__name compile-el">
               <span className="compile-blur">Lucas</span>{" "}
               <span className="compile-blur">

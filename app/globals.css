@@ -509,6 +509,24 @@ body {
   }
 }
 
+/* Circular avatar — mobile only, above the name */
+.hero__avatar {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .hero__avatar {
+    display: block;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center 20%;
+    margin-bottom: 1.25rem;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
 .hero__content {
   position: relative;
   max-width: 680px;
