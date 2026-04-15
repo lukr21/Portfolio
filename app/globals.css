@@ -298,12 +298,26 @@ body {
   -webkit-backdrop-filter: blur(24px) saturate(180%);
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset;
+
+  /* Restore glass instantly when closing */
+  transition: background 0s ease 0s,
+              backdrop-filter 0s ease 0s,
+              -webkit-backdrop-filter 0s ease 0s;
 }
 
-/* When open, hide bar's bottom border so it flows into dropdown */
+/* When open, go transparent so dropdown's glass shows as one surface.
+   Delay slightly so dropdown glass renders first (prevents flicker). */
 .mobile-bar--open {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   border-bottom-color: transparent;
   box-shadow: none;
+  transition: background 0.05s ease 0.05s,
+              backdrop-filter 0.05s ease 0.05s,
+              -webkit-backdrop-filter 0.05s ease 0.05s,
+              border-bottom-color 0s ease 0s,
+              box-shadow 0s ease 0s;
 }
 
 .mobile-bar__logo {
@@ -359,7 +373,7 @@ body {
 .mobile-dropdown {
   display: none; /* shown in @media */
   position: fixed;
-  top: 52px;
+  top: 0;
   left: 0;
   right: 0;
   z-index: 199;
@@ -367,7 +381,7 @@ body {
   overflow: hidden;
   transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* Liquid glass matching the bar */
+  /* Single glass surface — same as bar so they merge seamlessly */
   background: rgba(255, 255, 255, 0.45);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
@@ -379,6 +393,7 @@ body {
 }
 
 .mobile-dropdown__inner {
+  padding-top: 52px; /* space for the top bar */
   padding-bottom: 1rem;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
