@@ -160,7 +160,7 @@ export default function HomePage() {
                   <h3 className="project-card__title">Cycloidal Drive</h3>
                   <p className="project-card__excerpt">
                     Custom 3D-printed gear reduction with hand-assembled ball
-                    bearings. Two iterations from 12:1 proof-of-concept to 28:1
+                    bearings. Two iterations from 12:1 proof-of-concept to 26:1
                     production version.
                   </p>
                 </div>

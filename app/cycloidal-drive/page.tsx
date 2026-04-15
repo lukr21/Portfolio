@@ -14,7 +14,7 @@ export default function CycloidalDrivePage() {
         <h1 className="project-hero__title">Cycloidal Drive</h1>
         <p className="project-hero__subtitle">
           A 3D-printed gear reduction with hand-assembled ball bearings, from
-          12:1 proof-of-concept to 28:1 production version for the robotic arm.
+          12:1 proof-of-concept to 26:1 production version for the robotic arm.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
@@ -23,7 +23,7 @@ export default function CycloidalDrivePage() {
           </div>
           <div className="meta-item">
             <p className="meta-item__label">Iterations</p>
-            <p className="meta-item__value">V1 (12:1) &rarr; V2 (28:1)</p>
+            <p className="meta-item__value">V1 (12:1) &rarr; V2 (26:1)</p>
           </div>
           <div className="meta-item">
             <p className="meta-item__label">Material</p>
@@ -132,7 +132,7 @@ export default function CycloidalDrivePage() {
               <h2>V2 &ndash; For the Arm</h2>
               <p>
                 V2 was redesigned specifically for the robotic arm&apos;s joint
-                modules. The ratio jumped to 28:1 for more torque, and the stack
+                modules. The ratio jumped to 26:1 for more torque, and the stack
                 height was slimmed from 30mm to 20mm. The biggest change: the
                 housing now doubles as the output shell, so arm links bolt
                 directly to the rotating housing while the output pins stay

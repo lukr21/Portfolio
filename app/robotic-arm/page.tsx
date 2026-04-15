@@ -70,7 +70,7 @@ export default function RoboticArmPage() {
           Mechanical Design
         </ScrollReveal>
         <ScrollReveal tag="p">
-          The arm uses two types of custom gear reductions: 28:1 cycloidal
+          The arm uses two types of custom gear reductions: 26:1 cycloidal
           drives for the main joints (base, shoulder, elbow) and 5:1 planetary
           gearboxes for the smaller joints. Both use the same custom ball
           bearing design: 3D-printed raceways loaded with 4mm steel balls. The
@@ -92,7 +92,7 @@ export default function RoboticArmPage() {
             <div className="spec-card">
               <p className="spec-card__label">Gear Ratios</p>
               <p className="spec-card__value spec-card__value--blue">
-                28:1, 5:1
+                26:1, 5:1
               </p>
             </div>
             <div className="spec-card">
@@ -154,7 +154,7 @@ export default function RoboticArmPage() {
             </div>
             <div className="content-row__text">
               <p>
-                The base joint uses the 28:1 cycloidal drive where the housing
+                The base joint uses the 26:1 cycloidal drive where the housing
                 doubles as the output shell. You can see the custom ball bearing
                 inside, the 4mm steel balls sitting in the printed raceway. This
                 is where the axial friction issue was most apparent.
