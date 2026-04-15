@@ -12,7 +12,7 @@ export default function ESE3700Page() {
         <p className="project-hero__tag">UPenn ESE 3700 &middot; Spring 2026</p>
         <h1 className="project-hero__title">22nm CMOS Datapath &amp; Memory</h1>
         <p className="project-hero__subtitle">
-          Transistor-level design of an 8-bit adder and a 4&times;4 SRAM
+          Transistor-level design of an 8-bit adder and a 16&times;4 SRAM
           array in a 22nm process, covering the datapath and storage halves
           of any digital system. From Boolean derivation through Elmore
           delay modeling and SPICE validation. Projects from ESE 3700 at
