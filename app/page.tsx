@@ -117,6 +117,36 @@ export default function HomePage() {
         <div className="projects-grid">
           <ScrollReveal>
             <ProjectCardTilt className="project-card">
+              <Link href="/ese-3700" style={{ display: "contents" }}>
+                <div className="project-card__img-wrap">
+                  <img
+                    src="/assets/img/delay_comparison.png"
+                    alt="22nm CMOS Adder SPICE comparison"
+                    className="project-card__img"
+                    loading="lazy"
+                  />
+                  <div className="project-card__overlay" />
+                </div>
+                <div className="project-card__body">
+                  <p className="project-card__tag">
+                    UPenn ESE 3700 &middot; Spring 2026
+                  </p>
+                  <h3 className="project-card__title">
+                    22nm CMOS Datapath &amp; Memory
+                  </h3>
+                  <p className="project-card__excerpt">
+                    Transistor-level 8-bit adder and 16&times;4 SRAM in a
+                    22nm process. Design-space exploration, Elmore delay
+                    modeling, and SPICE validation.
+                  </p>
+                </div>
+                <span className="project-card__arrow">&rarr;</span>
+              </Link>
+            </ProjectCardTilt>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <ProjectCardTilt className="project-card">
               <Link href="/robotic-arm" style={{ display: "contents" }}>
                 <div className="project-card__img-wrap">
                   <img

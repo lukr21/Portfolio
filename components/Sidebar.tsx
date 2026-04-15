@@ -18,6 +18,16 @@ interface FolderItem {
 
 const folders: FolderItem[] = [
   {
+    label: "22nm CMOS Design",
+    path: "/ese-3700",
+    sections: [
+      { label: "Project 1: Adder", id: "project-1-adder" },
+      { label: "SPICE Results", id: "spice-results" },
+      { label: "Leakage Tradeoff", id: "leakage-tradeoff" },
+      { label: "Project 2: SRAM", id: "project-2-sram" },
+    ],
+  },
+  {
     label: "Robotic Arm",
     path: "/robotic-arm",
     sections: [
