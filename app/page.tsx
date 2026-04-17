@@ -94,29 +94,13 @@ export default function HomePage() {
         </HeroCursorGlow>
       </CompileAnimation>
 
-      {/* Experience Timeline */}
-      <section id="experience" className="section" style={{ paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
-        <ScrollReveal>
-          <p className="section__label">Experience</p>
-        </ScrollReveal>
-        <ScrollReveal>
-          <Timeline />
-        </ScrollReveal>
-      </section>
-
       {/* Projects Grid */}
-      <section id="projects" className="section">
+      <section id="projects" className="section" style={{ paddingTop: "2rem" }}>
         <ScrollReveal>
           <p className="section__label">Projects</p>
         </ScrollReveal>
         <ScrollReveal>
           <h2 className="section__title">{"What I've Built"}</h2>
-        </ScrollReveal>
-        <ScrollReveal>
-          <p className="section__desc">
-            From a 6-DOF robotic arm with custom gearboxes to a CNN image
-            classifier. each project started with a question I wanted to answer.
-          </p>
         </ScrollReveal>
 
         <div className="projects-grid">
@@ -290,6 +274,16 @@ export default function HomePage() {
             </ProjectCardTilt>
           </ScrollReveal>
         </div>
+      </section>
+
+      {/* Experience Timeline */}
+      <section id="experience" className="section" style={{ paddingTop: "2.5rem", paddingBottom: "2.5rem" }}>
+        <ScrollReveal>
+          <p className="section__label">Experience</p>
+        </ScrollReveal>
+        <ScrollReveal>
+          <Timeline />
+        </ScrollReveal>
       </section>
 
       {/* About */}
