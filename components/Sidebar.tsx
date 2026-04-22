@@ -293,7 +293,14 @@ export default function Sidebar() {
       <nav className="side-nav">
         <div className="side-nav__header">
           <Link href="/" className="side-nav__logo">
-            Lucas K.
+            <img
+              src="/assets/img/lk-black-bone-r90-180.png"
+              alt=""
+              aria-hidden="true"
+              className="side-nav__logo-mark"
+            />
+            <span className="side-nav__logo-divider" aria-hidden="true" />
+            <span>Lucas Krippendorff</span>
           </Link>
           <span className="side-nav__subtitle">
             Electrical Engineering @ UPenn
@@ -313,7 +320,11 @@ export default function Sidebar() {
       {/* ── Mobile top bar + dropdown (visible below 1024px) ── */}
       <header className={`mobile-bar${mobileOpen ? " mobile-bar--open" : ""}`}>
         <Link href="/" className="mobile-bar__logo" onClick={closeMobile}>
-          Lucas K.
+          <img
+            src="/assets/img/lk-black-bone-r90-180.png"
+            alt="Lucas Krippendorff"
+            className="mobile-bar__logo-mark"
+          />
         </Link>
         <button
           className="mobile-bar__toggle"
