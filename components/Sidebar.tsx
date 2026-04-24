@@ -21,16 +21,24 @@ const folders: FolderItem[] = [
     label: "22nm CMOS Design",
     path: "/ese-3700",
     sections: [
+      { label: "Overview", id: "" },
       { label: "Project 1: Adder", id: "project-1-adder" },
       { label: "SPICE Results", id: "spice-results" },
       { label: "Leakage Tradeoff", id: "leakage-tradeoff" },
       { label: "Project 2: SRAM", id: "project-2-sram" },
+      { label: "Top-Level Architecture", id: "top-level" },
+      { label: "One Full Clock Cycle", id: "one-cycle" },
+      { label: "Functional Verification", id: "functional-verification" },
+      { label: "How Fast Can It Go?", id: "performance-ceiling" },
+      { label: "Summary of Metrics", id: "summary" },
+      { label: "What\u2019s Next", id: "whats-next" },
     ],
   },
   {
     label: "Robotic Arm",
     path: "/robotic-arm",
     sections: [
+      { label: "Overview", id: "" },
       { label: "The Challenge", id: "the-challenge" },
       { label: "Mechanical Design", id: "mechanical-design" },
       { label: "Software Stack", id: "software-stack" },
@@ -41,6 +49,7 @@ const folders: FolderItem[] = [
     label: "Cycloidal Drive",
     path: "/cycloidal-drive",
     sections: [
+      { label: "Overview", id: "" },
       { label: "Why Cycloidal?", id: "why-cycloidal" },
       { label: "V1 \u2013 Proof of Concept", id: "v1-proof-of-concept" },
       { label: "V2 \u2013 For the Arm", id: "v2-for-the-arm" },
@@ -51,6 +60,7 @@ const folders: FolderItem[] = [
     label: "Cat/Dog Classifier",
     path: "/classifier",
     sections: [
+      { label: "Overview", id: "" },
       { label: "Why This Project?", id: "why-this-project" },
       { label: "Architecture", id: "architecture" },
       { label: "Training Results", id: "training-results" },
@@ -61,6 +71,7 @@ const folders: FolderItem[] = [
     label: "FRC Shooter",
     path: "/frc-shooter",
     sections: [
+      { label: "Overview", id: "" },
       { label: "Game Context", id: "game-context" },
       { label: "What I Built", id: "what-i-built" },
       { label: "Design Highlights", id: "design-highlights" },
@@ -71,6 +82,7 @@ const folders: FolderItem[] = [
     label: "Hazed (Music)",
     path: "/hazed",
     sections: [
+      { label: "Overview", id: "" },
       { label: "About Hazed", id: "about-hazed" },
       { label: "Listen", id: "listen" },
       { label: "Process", id: "process" },
@@ -84,6 +96,8 @@ function FolderTree({
   openFolder,
   toggleFolder,
   handleFolderClick,
+  handleOverviewClick,
+  activeSection,
   onLinkClick,
   isMobile,
 }: {
@@ -95,6 +109,8 @@ function FolderTree({
     f: FolderItem,
     active: boolean,
   ) => void;
+  handleOverviewClick: (e: React.MouseEvent, folderPath: string) => void;
+  activeSection: string;
   onLinkClick?: () => void;
   isMobile?: boolean;
 }) {
@@ -178,27 +194,54 @@ function FolderTree({
 
             <div className="file-tree__sections-wrap">
               <ul className="file-tree__sections">
-                {folder.sections.map((section) => (
-                  <li key={section.id}>
-                    {isMobile ? (
-                      <Link
-                        href={`${folder.path}#${section.id}`}
-                        className="file-tree__section-link"
-                        onClick={onLinkClick}
-                      >
-                        {section.label}
-                      </Link>
-                    ) : (
-                      <a
-                        href={`#${section.id}`}
-                        className="file-tree__section-link"
-                        onClick={onLinkClick}
-                      >
-                        {section.label}
-                      </a>
-                    )}
-                  </li>
-                ))}
+                {folder.sections.map((section) => {
+                  const isOverview = section.id === "";
+                  const isOnFolderPage = pathname === folder.path;
+                  const isActiveSection =
+                    isOnFolderPage &&
+                    ((isOverview && activeSection === "") ||
+                      (!isOverview && activeSection === section.id));
+                  const linkClass = `file-tree__section-link${isActiveSection ? " active" : ""}`;
+
+                  if (isOverview) {
+                    return (
+                      <li key="overview">
+                        <Link
+                          href={folder.path}
+                          className={linkClass}
+                          onClick={(e) => {
+                            handleOverviewClick(e, folder.path);
+                            onLinkClick?.();
+                          }}
+                        >
+                          {section.label}
+                        </Link>
+                      </li>
+                    );
+                  }
+
+                  return (
+                    <li key={section.id}>
+                      {isMobile ? (
+                        <Link
+                          href={`${folder.path}#${section.id}`}
+                          className={linkClass}
+                          onClick={onLinkClick}
+                        >
+                          {section.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href={`#${section.id}`}
+                          className={linkClass}
+                          onClick={onLinkClick}
+                        >
+                          {section.label}
+                        </a>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           </li>
@@ -258,6 +301,7 @@ export default function Sidebar() {
   const router = useRouter();
   const [openFolder, setOpenFolder] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     const match = folders.find((f) => pathname.startsWith(f.path));
@@ -266,6 +310,88 @@ export default function Sidebar() {
 
   useEffect(() => {
     setMobileOpen(false);
+  }, [pathname]);
+
+  // Track which section is currently in view on the current project page
+  useEffect(() => {
+    const folder = folders.find((f) => pathname === f.path);
+    if (!folder) {
+      setActiveSection("");
+      return;
+    }
+
+    const sectionIds = folder.sections.map((s) => s.id).filter(Boolean);
+    // Resolve elements — retry on next frame in case content hasn't mounted yet
+    let elements: HTMLElement[] = [];
+    let rafId = 0;
+
+    const resolveElements = () => {
+      elements = sectionIds
+        .map((id) => document.getElementById(id))
+        .filter((el): el is HTMLElement => el !== null);
+      if (elements.length === 0) {
+        rafId = requestAnimationFrame(resolveElements);
+        return;
+      }
+      attachObserver();
+    };
+
+    let observer: IntersectionObserver | null = null;
+    const visibleIds = new Set<string>();
+
+    const updateActive = () => {
+      if (window.scrollY < 100) {
+        // Near top of page — consider this "Overview"
+        setActiveSection("");
+        return;
+      }
+      if (visibleIds.size === 0) return;
+      // Pick the topmost visible section
+      let topEl: HTMLElement | null = null;
+      let topRect = Infinity;
+      elements.forEach((el) => {
+        if (!visibleIds.has(el.id)) return;
+        const rect = el.getBoundingClientRect();
+        if (rect.top < topRect) {
+          topRect = rect.top;
+          topEl = el;
+        }
+      });
+      if (topEl) setActiveSection((topEl as HTMLElement).id);
+    };
+
+    const attachObserver = () => {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) visibleIds.add(entry.target.id);
+            else visibleIds.delete(entry.target.id);
+          });
+          updateActive();
+        },
+        {
+          // Activate a section when its top enters the upper ~40% of the viewport
+          rootMargin: "-10% 0px -55% 0px",
+          threshold: 0,
+        },
+      );
+      elements.forEach((el) => observer!.observe(el));
+      // Run once to initialize based on scroll position
+      updateActive();
+    };
+
+    const onScroll = () => {
+      if (window.scrollY < 100) setActiveSection("");
+    };
+
+    resolveElements();
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer?.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [pathname]);
 
   const toggleFolder = useCallback((path: string) => {
@@ -283,6 +409,18 @@ export default function Sidebar() {
       }
     },
     [router],
+  );
+
+  const handleOverviewClick = useCallback(
+    (e: React.MouseEvent, folderPath: string) => {
+      if (pathname === folderPath) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        setActiveSection("");
+      }
+      // Otherwise let the Link navigate normally
+    },
+    [pathname],
   );
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
@@ -312,6 +450,8 @@ export default function Sidebar() {
           openFolder={openFolder}
           toggleFolder={toggleFolder}
           handleFolderClick={handleFolderClick}
+          handleOverviewClick={handleOverviewClick}
+          activeSection={activeSection}
         />
 
         <SocialFooter />
@@ -358,6 +498,8 @@ export default function Sidebar() {
             openFolder={openFolder}
             toggleFolder={toggleFolder}
             handleFolderClick={handleFolderClick}
+            handleOverviewClick={handleOverviewClick}
+            activeSection={activeSection}
             onLinkClick={closeMobile}
             isMobile
           />
