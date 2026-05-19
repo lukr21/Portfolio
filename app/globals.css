@@ -248,6 +248,44 @@ body {
   background: var(--blue);
 }
 
+/* Sub-folder header (level-2 folder, e.g. "Project 1: Adder") */
+.file-tree__subfolder {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding-left: 1.55rem;
+}
+
+.file-tree__subfolder > .file-tree__chevron {
+  width: 14px;
+  height: 14px;
+  color: var(--text-muted);
+}
+
+.file-tree__section-link--subfolder {
+  padding: 0.25rem 1.25rem 0.25rem 0.35rem;
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.file-tree__section-link--subfolder::before {
+  display: none;
+}
+
+.file-tree__item.open > .file-tree__subfolder > .file-tree__chevron svg {
+  transform: rotate(90deg);
+}
+
+/* Nested (level-2) section links — one indent deeper than top-level sections */
+.file-tree__section-link--nested {
+  padding-left: 3.75rem;
+}
+
+.file-tree__section-link--nested::before {
+  left: 2.8rem;
+}
+
 .side-nav__footer {
   margin-top: auto;
   padding: 1.25rem 1.25rem 0;
@@ -761,6 +799,10 @@ body {
   gap: 1.5rem;
 }
 
+.projects-grid > .reveal {
+  height: 100%;
+}
+
 .project-card {
   background: var(--bg);
   border: 1px solid var(--border);
@@ -771,6 +813,7 @@ body {
   color: inherit;
   display: block;
   position: relative;
+  height: 100%;
 }
 
 .project-card:hover {

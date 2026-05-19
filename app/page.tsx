@@ -33,9 +33,8 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="hero__desc compile-el">
-              Happy you&apos;re here! I&apos;m a second-year Electrical
-              Engineering student at the University of Pennsylvania, working at
-              the intersection of mechanical and electronic design: analog,
+              Electrical Engineering at the University of Pennsylvania, working
+              at the intersection of mechanical and electronic design: analog,
               digital, and everything in between. What I enjoy most is
               navigating the tradeoffs between functionality, complexity, and
               cost.
@@ -49,8 +48,45 @@ export default function HomePage() {
                 className="btn btn--ghost"
                 target="_blank"
               >
-                Resume &uarr;
+                Resume ↗
               </a>
+            </div>
+            <div
+              className="hero__email compile-el"
+              style={{
+                marginTop: "1rem",
+                fontSize: "0.95rem",
+                color: "var(--text-secondary)",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "0.4rem",
+              }}
+            >
+              <CopyEmail email="lk.krippendorff@gmail.com">
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    color: "var(--text-secondary)",
+                    textDecoration: "none",
+                  }}
+                >
+                  <span>lk.krippendorff@gmail.com</span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    style={{
+                      width: 14,
+                      height: 14,
+                      fill: "currentColor",
+                      opacity: 0.7,
+                    }}
+                    aria-hidden="true"
+                  >
+                    <path d="M16 1H4a2 2 0 0 0-2 2v14h2V3h12V1zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm0 16H8V7h11v14z" />
+                  </svg>
+                </span>
+              </CopyEmail>
             </div>
             <div
               className="contact-icons compile-el"
@@ -124,9 +160,9 @@ export default function HomePage() {
                     22nm CMOS Datapath &amp; Memory
                   </h3>
                   <p className="project-card__excerpt">
-                    Transistor-level 8-bit adder and 16&times;4 SRAM in a
-                    22nm process. Design-space exploration, Elmore delay
-                    modeling, and SPICE validation.
+                    8-bit adder and 16&times;4 SRAM in 22nm. The optimized
+                    adder runs 27% faster but leaks 10&times; the power, and
+                    Elmore delay gets the sizing backwards from SPICE.
                   </p>
                 </div>
                 <span className="project-card__arrow">&rarr;</span>
@@ -152,9 +188,11 @@ export default function HomePage() {
                   </p>
                   <h3 className="project-card__title">6-DOF Robotic Arm</h3>
                   <p className="project-card__excerpt">
-                    Fully 3D-printed arm with custom cycloidal drives, inverse
-                    kinematics, and a web-based control interface. Built with $10
-                    in steel balls.
+                    Solo six-DOF arm: custom cycloidal drives, Python IK,
+                    Arduino firmware, and a browser-based trajectory editor.
+                    Every bearing 3D-printed around $10 of steel balls. Shelved
+                    when bearing friction outran the motor torque budget, which
+                    was the lesson.
                   </p>
                 </div>
                 <span className="project-card__arrow">&rarr;</span>
@@ -178,9 +216,11 @@ export default function HomePage() {
                   <p className="project-card__tag">R&amp;D &middot; 2025</p>
                   <h3 className="project-card__title">Cycloidal Drive</h3>
                   <p className="project-card__excerpt">
-                    Custom 3D-printed gear reduction with hand-assembled ball
-                    bearings. Two iterations from 12:1 proof-of-concept to 26:1
-                    production version.
+                    A 3D-printable cycloidal gearbox in two iterations: V1 at
+                    12:1 to prove the geometry, V2 at 26:1 for the arm. V2
+                    collapses the output stage into the housing, slimming the
+                    stack from 30mm to 20mm. ~$20 BOM including hand-loaded
+                    steel-ball bearings.
                   </p>
                 </div>
                 <span className="project-card__arrow">&rarr;</span>
@@ -208,9 +248,10 @@ export default function HomePage() {
                     Cat/Dog CNN Classifier
                   </h3>
                   <p className="project-card__excerpt">
-                    PyTorch convolutional neural network trained on 24k images.
-                    Self-directed deep dive beyond course content, achieving
-                    97.8% accuracy.
+                    The course had only covered a single-layer perceptron. I
+                    taught myself CNNs, built a 4-layer one in PyTorch, trained
+                    it on 24k images, and hit 97.8%. My first real look at ML
+                    as engineerable.
                   </p>
                 </div>
                 <span className="project-card__arrow">&rarr;</span>
@@ -236,9 +277,11 @@ export default function HomePage() {
                   </p>
                   <h3 className="project-card__title">Ring Shooter Module</h3>
                   <p className="project-card__excerpt">
-                    Dual-stage flywheel launcher for FIRST Robotics Competition.
-                    Designed the mechanical arm, roller system, and articulation
-                    joint.
+                    Mechanical design of a dual-stage flywheel ring launcher
+                    for FRC 2024. The flywheel stored ~5&times; the rotational
+                    energy of a bare roller for consistent far-field range, and
+                    the arm unbolts in one piece for sub-5-minute pit service.
+                    My first project under real constraints.
                   </p>
                 </div>
                 <span className="project-card__arrow">&rarr;</span>
@@ -264,9 +307,9 @@ export default function HomePage() {
                   </p>
                   <h3 className="project-card__title">Hazed (Spotify)</h3>
                   <p className="project-card__excerpt">
-                    Solo music project. Electronic production, mixing, and
-                    release. Self-taught, always exploring new genres and
-                    techniques.
+                    Self-produced electronic music on Spotify under the name
+                    Hazed. Releasing since 2023, everything mixed in Ableton.
+                    The non-engineering corner of my brain.
                   </p>
                 </div>
                 <span className="project-card__arrow">&rarr;</span>

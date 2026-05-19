@@ -8,6 +8,7 @@ import CopyEmail from "@/components/CopyEmail";
 interface Section {
   label: string;
   id: string;
+  sections?: Section[];
 }
 
 interface FolderItem {
@@ -16,21 +17,40 @@ interface FolderItem {
   sections: Section[];
 }
 
+function flattenIds(sections: Section[]): string[] {
+  const ids: string[] = [];
+  for (const s of sections) {
+    if (s.id) ids.push(s.id);
+    if (s.sections) ids.push(...flattenIds(s.sections));
+  }
+  return ids;
+}
+
 const folders: FolderItem[] = [
   {
     label: "22nm CMOS Design",
     path: "/ese-3700",
     sections: [
       { label: "Overview", id: "" },
-      { label: "Project 1: Adder", id: "project-1-adder" },
-      { label: "SPICE Results", id: "spice-results" },
-      { label: "Leakage Tradeoff", id: "leakage-tradeoff" },
-      { label: "Project 2: SRAM", id: "project-2-sram" },
-      { label: "Top-Level Architecture", id: "top-level" },
-      { label: "One Full Clock Cycle", id: "one-cycle" },
-      { label: "Functional Verification", id: "functional-verification" },
-      { label: "How Fast Can It Go?", id: "performance-ceiling" },
-      { label: "Summary of Metrics", id: "summary" },
+      {
+        label: "Project 1: Adder",
+        id: "project-1-adder",
+        sections: [
+          { label: "SPICE Results", id: "spice-results" },
+          { label: "Leakage Tradeoff", id: "leakage-tradeoff" },
+        ],
+      },
+      {
+        label: "Project 2: SRAM",
+        id: "project-2-sram",
+        sections: [
+          { label: "Top-Level Architecture", id: "top-level" },
+          { label: "One Full Clock Cycle", id: "one-cycle" },
+          { label: "Functional Verification", id: "functional-verification" },
+          { label: "How Fast Can It Go?", id: "performance-ceiling" },
+          { label: "Summary of Metrics", id: "summary" },
+        ],
+      },
       { label: "What\u2019s Next", id: "whats-next" },
     ],
   },
@@ -95,6 +115,8 @@ function FolderTree({
   pathname,
   openFolder,
   toggleFolder,
+  openSubFolder,
+  toggleSubFolder,
   handleFolderClick,
   handleOverviewClick,
   activeSection,
@@ -104,6 +126,8 @@ function FolderTree({
   pathname: string;
   openFolder: string | null;
   toggleFolder: (p: string) => void;
+  openSubFolder: string | null;
+  toggleSubFolder: (id: string) => void;
   handleFolderClick: (
     e: React.MouseEvent,
     f: FolderItem,
@@ -220,6 +244,86 @@ function FolderTree({
                     );
                   }
 
+                  if (section.sections) {
+                    const isSubOpen = openSubFolder === section.id;
+                    const subFolderLinkClass = `file-tree__section-link file-tree__section-link--subfolder${isActiveSection ? " active" : ""}`;
+                    return (
+                      <li
+                        key={section.id}
+                        className={`file-tree__item file-tree__subitem${isSubOpen ? " open" : ""}`}
+                      >
+                        <div className="file-tree__subfolder">
+                          <button
+                            className="file-tree__chevron"
+                            onClick={() => toggleSubFolder(section.id)}
+                            aria-expanded={isSubOpen}
+                            aria-label={`Toggle ${section.label}`}
+                          >
+                            <svg
+                              width="12"
+                              height="12"
+                              viewBox="0 0 12 12"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <polyline points="4,2 8,6 4,10" />
+                            </svg>
+                          </button>
+                          {isMobile ? (
+                            <Link
+                              href={`${folder.path}#${section.id}`}
+                              className={subFolderLinkClass}
+                              onClick={onLinkClick}
+                            >
+                              {section.label}
+                            </Link>
+                          ) : (
+                            <a
+                              href={`#${section.id}`}
+                              className={subFolderLinkClass}
+                              onClick={onLinkClick}
+                            >
+                              {section.label}
+                            </a>
+                          )}
+                        </div>
+                        <div className="file-tree__sections-wrap">
+                          <ul className="file-tree__sections file-tree__sections--nested">
+                            {section.sections.map((child) => {
+                              const isChildActive =
+                                isOnFolderPage && activeSection === child.id;
+                              const childClass = `file-tree__section-link file-tree__section-link--nested${isChildActive ? " active" : ""}`;
+                              return (
+                                <li key={child.id}>
+                                  {isMobile ? (
+                                    <Link
+                                      href={`${folder.path}#${child.id}`}
+                                      className={childClass}
+                                      onClick={onLinkClick}
+                                    >
+                                      {child.label}
+                                    </Link>
+                                  ) : (
+                                    <a
+                                      href={`#${child.id}`}
+                                      className={childClass}
+                                      onClick={onLinkClick}
+                                    >
+                                      {child.label}
+                                    </a>
+                                  )}
+                                </li>
+                              );
+                            })}
+                          </ul>
+                        </div>
+                      </li>
+                    );
+                  }
+
                   return (
                     <li key={section.id}>
                       {isMobile ? (
@@ -300,6 +404,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [openFolder, setOpenFolder] = useState<string | null>(null);
+  const [openSubFolder, setOpenSubFolder] = useState<string | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
 
@@ -320,7 +425,7 @@ export default function Sidebar() {
       return;
     }
 
-    const sectionIds = folder.sections.map((s) => s.id).filter(Boolean);
+    const sectionIds = flattenIds(folder.sections);
     // Resolve elements — retry on next frame in case content hasn't mounted yet
     let elements: HTMLElement[] = [];
     let rafId = 0;
@@ -394,8 +499,33 @@ export default function Sidebar() {
     };
   }, [pathname]);
 
+  // Auto-open the sub-folder that contains the currently active section
+  useEffect(() => {
+    const folder = folders.find((f) => pathname === f.path);
+    if (!folder) {
+      setOpenSubFolder(null);
+      return;
+    }
+    let found: string | null = null;
+    for (const sec of folder.sections) {
+      if (!sec.sections) continue;
+      if (
+        activeSection === sec.id ||
+        sec.sections.some((s) => s.id === activeSection)
+      ) {
+        found = sec.id;
+        break;
+      }
+    }
+    setOpenSubFolder(found);
+  }, [pathname, activeSection]);
+
   const toggleFolder = useCallback((path: string) => {
     setOpenFolder((prev) => (prev === path ? null : path));
+  }, []);
+
+  const toggleSubFolder = useCallback((id: string) => {
+    setOpenSubFolder((prev) => (prev === id ? null : id));
   }, []);
 
   const handleFolderClick = useCallback(
@@ -449,6 +579,8 @@ export default function Sidebar() {
           pathname={pathname}
           openFolder={openFolder}
           toggleFolder={toggleFolder}
+          openSubFolder={openSubFolder}
+          toggleSubFolder={toggleSubFolder}
           handleFolderClick={handleFolderClick}
           handleOverviewClick={handleOverviewClick}
           activeSection={activeSection}
@@ -497,6 +629,8 @@ export default function Sidebar() {
             pathname={pathname}
             openFolder={openFolder}
             toggleFolder={toggleFolder}
+            openSubFolder={openSubFolder}
+            toggleSubFolder={toggleSubFolder}
             handleFolderClick={handleFolderClick}
             handleOverviewClick={handleOverviewClick}
             activeSection={activeSection}
