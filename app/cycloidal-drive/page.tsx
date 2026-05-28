@@ -13,8 +13,11 @@ export default function CycloidalDrivePage() {
         <p className="project-hero__tag">R&amp;D &middot; 2025</p>
         <h1 className="project-hero__title">Cycloidal Drive</h1>
         <p className="project-hero__subtitle">
-          A 3D-printed gear reduction with hand-assembled ball bearings, from
-          12:1 proof-of-concept to 26:1 production version for the robotic arm.
+          A 3D-printable cycloidal gearbox in two iterations: a 12:1
+          proof-of-concept, then a 26:1 redesign for the robotic arm&apos;s
+          joints. The exercise was about how cheap you could go. Every bearing
+          is steel balls in a printed PETG raceway, and total BOM lands around
+          $20 per drive.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">

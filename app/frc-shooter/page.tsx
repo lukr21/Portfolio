@@ -13,8 +13,10 @@ export default function FrcShooterPage() {
         <p className="project-hero__tag">FIRST Robotics &middot; FRC 2024</p>
         <h1 className="project-hero__title">Ring Shooter Module</h1>
         <p className="project-hero__subtitle">
-          Mechanical design for Team 5557 (BB-Raiders), a dual-stage flywheel
-          launcher that could hit far-field goals reliably.
+          Mechanical design of a dual-stage flywheel ring launcher for FRC 2024,
+          built with Team 5557 (BB-Raiders). The shooter had to fire accurately
+          at full field range while cycling fast enough for multiple shots per
+          match, and unbolt quickly enough for pit service between matches.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
@@ -78,7 +80,7 @@ export default function FrcShooterPage() {
             <div className="content-row__text">
               <h2>What I Built</h2>
               <p>
-                I designed the entire shooter arm assembly: a black delrin arm
+                I helped design the shooter arm assembly: a black delrin arm
                 that holds the roller system, pivots for variable launch angles,
                 and bolts directly onto the robot&apos;s main structure. The key
                 design decision was a dual-stage roller system with independent

@@ -15,9 +15,11 @@ export default function RoboticArmPage() {
         </p>
         <h1 className="project-hero__title">6-DOF Desktop Robotic Arm</h1>
         <p className="project-hero__subtitle">
-          A fully 3D-printed robotic arm with custom gear reductions, inverse
-          kinematics, and a web-based control interface, built with a $10 bag of
-          steel balls.
+          A solo six-DOF desktop arm spanning the full stack: cycloidal drives
+          I designed from scratch, custom 3D-printed bearings, a Python IK
+          solver and trajectory planner, Arduino motor firmware, and a
+          browser-based control interface. The $10 bag of steel balls was the
+          constraint that drove everything else.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">

@@ -12,8 +12,11 @@ export default function ClassifierPage() {
         <p className="project-hero__tag">UPenn ENGR 1050 &middot; December 2024</p>
         <h1 className="project-hero__title">Cat/Dog Image Classifier</h1>
         <p className="project-hero__subtitle">
-          A PyTorch CNN trained on 24,000 images, a self-directed deep dive into
-          convolutional neural networks that went well beyond course content.
+          A 4-layer convolutional neural network in PyTorch, trained on 24,000
+          images to classify cats vs. dogs. Built as the final project for an
+          intro engineering course that hadn&apos;t covered anything beyond a
+          single-layer perceptron, so most of the work was teaching myself how
+          CNNs actually function.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
