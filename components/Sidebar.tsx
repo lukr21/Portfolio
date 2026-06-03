@@ -105,6 +105,7 @@ const folders: FolderItem[] = [
       { label: "Overview", id: "" },
       { label: "About Hazed", id: "about-hazed" },
       { label: "Listen", id: "listen" },
+      { label: "Follow", id: "follow" },
       { label: "Process", id: "process" },
     ],
   },
