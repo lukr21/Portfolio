@@ -33,9 +33,9 @@ const items: TimelineItem[] = [
     logo: "/assets/img/subvysion-logo.png",
     logoAlt: "SubVysion logo",
     company: "SubVysion",
-    role: "Hardware Intern",
+    role: "Hardware Engineer Intern",
     date: "Mar 2026 — Present",
-    skills: ["Product Design", "Hardware Integration", "Computer Vision", "3D Mapping"],
+    skills: ["Electrical Design", "Mechanical CAD", "Sensor Integration", "Power Distribution"],
     href: "https://subvysion.com/",
   },
 ];
