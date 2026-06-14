@@ -518,8 +518,9 @@ body {
   z-index: 1;
 }
 
-/* Hero portrait — fades in on load, behind the grid overlay */
+/* Hero portrait — replaced by the in-column avatar in the two-column hero */
 .hero__portrait {
+  display: none;
   position: absolute;
   top: 50%;
   right: 4vw;
@@ -569,28 +570,138 @@ body {
   }
 }
 
-/* Circular avatar — mobile only, above the name */
+/* Headshot avatar — now shown in the left identity column at all sizes */
 .hero__avatar {
-  display: none;
+  display: block;
+  width: 132px;
+  height: 132px;
+  border-radius: 16px;
+  object-fit: cover;
+  object-position: center 20%;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
 }
 
 @media (max-width: 900px) {
   .hero__avatar {
-    display: block;
     width: 96px;
     height: 96px;
     border-radius: 50%;
-    object-fit: cover;
-    object-position: center 20%;
     margin-bottom: 1.25rem;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   }
 }
 
 .hero__content {
   position: relative;
-  max-width: 680px;
   z-index: 2;
+  width: 100%;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  gap: 3.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .hero__content {
+    grid-template-columns: 1fr;
+    gap: 2.25rem;
+    max-width: 640px;
+  }
+}
+
+/* Experience block shown after Projects on mobile only */
+.exp-mobile {
+  display: none;
+}
+
+@media (max-width: 1024px) {
+  .exp-mobile {
+    display: block;
+  }
+}
+
+/* Right column: about + experience list */
+.hero__right {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.hero__right .hero__desc {
+  margin-bottom: 0;
+  max-width: none;
+}
+
+.hero__exp {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.hero__exp-item {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  text-decoration: none;
+}
+
+.hero__exp-logo {
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 6px;
+}
+
+.hero__exp-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.hero__exp-role {
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  color: var(--text);
+  transition: color var(--transition);
+}
+
+.hero__exp-item:hover .hero__exp-role {
+  color: var(--blue);
+}
+
+.hero__exp-company {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.hero__exp-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+.hero__exp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.hero__exp-tag {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  color: var(--text-secondary);
 }
 
 .hero__greeting {
@@ -616,6 +727,36 @@ body {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+.hero__title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+}
+
+.hero__status {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.75rem;
+  max-width: 560px;
+  line-height: 1.6;
+}
+
+.hero__status-dot {
+  flex-shrink: 0;
+  width: 8px;
+  height: 8px;
+  margin-top: 0.45rem;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.18);
 }
 
 .hero__desc {
@@ -1456,5 +1597,13 @@ body {
 
   .specs-grid {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Mobile: keep the hero to the identity card so Projects come up sooner.
+   Placed at end-of-file so it overrides the base .hero__right display. */
+@media (max-width: 1024px) {
+  .hero__right {
+    display: none;
   }
 }
