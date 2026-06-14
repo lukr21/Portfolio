@@ -69,6 +69,9 @@ export default function ESE3700Page() {
         </ScrollReveal>
 
         {/* Zoom into one bit-slice: the full adder and its outputs */}
+        <ScrollReveal tag="h2" id="full-adder">
+          Full Adder Bit-Slice
+        </ScrollReveal>
         <ScrollReveal tag="p">
           Each bit-slice is a full adder. Its two outputs are:
         </ScrollReveal>
@@ -131,6 +134,9 @@ export default function ESE3700Page() {
         </ScrollReveal>
 
         {/* Two XOR2 implementations: the optimization */}
+        <ScrollReveal tag="h2" id="xor-implementation">
+          XOR2 Implementation
+        </ScrollReveal>
         <ScrollReveal tag="p">
           That bit-slice leans on an XOR2, so the last decision was which
           XOR2 to actually build it from. (Several alternative sum and carry
@@ -482,7 +488,7 @@ export default function ESE3700Page() {
 
         {/* Foundational building block: the 6T bitcell */}
         <ScrollReveal tag="h2" id="bitcell">
-          The 6T Bitcell
+          6T Bitcell
         </ScrollReveal>
         <ScrollReveal tag="p">
           The whole array is sixteen by four of one cell. Two cross-coupled

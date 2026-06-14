@@ -36,6 +36,8 @@ const folders: FolderItem[] = [
         label: "Project 1: Adder",
         id: "project-1-adder",
         sections: [
+          { label: "Full Adder Bit-Slice", id: "full-adder" },
+          { label: "XOR2 Implementation", id: "xor-implementation" },
           { label: "SPICE Results", id: "spice-results" },
           { label: "Leakage Tradeoff", id: "leakage-tradeoff" },
         ],
@@ -45,6 +47,7 @@ const folders: FolderItem[] = [
         id: "project-2-sram",
         sections: [
           { label: "Top-Level Architecture", id: "top-level" },
+          { label: "6T Bitcell", id: "bitcell" },
           { label: "One Full Clock Cycle", id: "one-cycle" },
           { label: "Functional Verification", id: "functional-verification" },
           { label: "How Fast Can It Go?", id: "performance-ceiling" },
