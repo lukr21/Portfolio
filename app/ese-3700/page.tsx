@@ -13,10 +13,12 @@ export default function ESE3700Page() {
         <h1 className="project-hero__title">22nm CMOS Datapath &amp; Memory</h1>
         <p className="project-hero__subtitle">
           Transistor-level design of an 8-bit adder and a 16&times;4 SRAM
-          array in a 22nm process, covering the datapath and storage halves
-          of any digital system. From Boolean derivation through Elmore
-          delay modeling and SPICE validation. Projects from ESE 3700 at
-          the University of Pennsylvania.
+          (static random-access memory) array in the 22nm process provided
+          by the course, covering the datapath and storage halves of any
+          digital system. From
+          Boolean derivation through Elmore delay modeling and SPICE
+          (Simulation Program with Integrated Circuit Emphasis) validation.
+          Projects from ESE 3700 at the University of Pennsylvania.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
@@ -43,8 +45,32 @@ export default function ESE3700Page() {
           Project 1: 8-bit Ripple-Carry Adder
         </ScrollReveal>
         <ScrollReveal tag="p">
-          An 8-bit ripple-carry adder, built and simulated in Electric VLSI.
-          The full adder&apos;s outputs are:
+          An 8-bit ripple-carry adder, built and simulated in Electric VLSI
+          (very-large-scale integration).
+          The complete datapath is eight bit-slices chained carry-to-carry:
+          a half adder at bit 0 feeding seven full adders, each stage&apos;s
+          C<sub>out</sub> rippling up into the next stage&apos;s
+          C<sub>in</sub>.
+        </ScrollReveal>
+        <ScrollReveal>
+          <div className="media-block media-block--full-width">
+            <img
+              src="/assets/img/FullAdder8bit.png"
+              alt="Complete 8-bit ripple-carry adder schematic: a half adder at bit 0 cascaded with seven full-adder bit-slices, each carry-out feeding the next carry-in, wrapped into a single 8-bit adder block symbol"
+              loading="lazy"
+            />
+            <div className="media-block__caption">
+              The complete 8-bit ripple-carry adder. A half adder at bit 0
+              cascaded with seven full-adder bit-slices; each C<sub>out</sub>
+              feeds the next stage&apos;s C<sub>in</sub>. On the right, the
+              assembled cell packaged as a single 8-bit adder symbol.
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* Zoom into one bit-slice: the full adder and its outputs */}
+        <ScrollReveal tag="p">
+          Each bit-slice is a full adder. Its two outputs are:
         </ScrollReveal>
         <ScrollReveal>
           <div
@@ -64,48 +90,9 @@ export default function ESE3700Page() {
           </div>
         </ScrollReveal>
         <ScrollReveal tag="p">
-          Both depend on A &oplus; B, which made XOR2 the natural primitive
-          to build around. Compute it once, feed it into both the sum and
-          carry paths. Several alternative sum and carry topologies were
-          explored and rejected along the way; that analysis is in the
-          full report. Once the topology was settled, the interesting
-          question became which XOR2 implementation to use.
-        </ScrollReveal>
-
-        {/* Two XOR2 implementations: the optimization */}
-        <ScrollReveal tag="p">
-          Two candidates were carried forward and compared head-to-head at
-          the full 8-bit system level:
-        </ScrollReveal>
-
-        <ScrollReveal>
-          <div className="media-row">
-            <div className="media-block">
-              <img
-                src="/assets/img/XOR2_nand.png"
-                alt="Baseline XOR2 cell built from four NAND2 gates"
-                loading="lazy"
-              />
-              <div className="media-block__caption">
-                <strong>Baseline:</strong> four-NAND2 XOR2 (16 T). Every
-                node fully restored, easy to analyze, conservative.
-              </div>
-            </div>
-            <div className="media-block">
-              <img
-                src="/assets/img/XOR2_min.png"
-                alt="Transistor-level schematic of the optimized transmission-gate XOR2 cell with output buffer"
-                loading="lazy"
-              />
-              <div className="media-block__caption">
-                <strong>Optimization:</strong> transmission-gate XOR2 with
-                two-inverter output buffer (10 T). Same logic, 40% fewer
-                transistors, and a shorter signal path. The buffer restores
-                the TG&apos;s voltage output to a full rail-to-rail logic
-                level before the next stage.
-              </div>
-            </div>
-          </div>
+          Both depend on A &oplus; B, which made XOR2 (a two-input
+          exclusive-OR gate) the natural primitive to build around: compute it once, then feed it into both the sum
+          and carry paths.
         </ScrollReveal>
 
         <ScrollReveal>
@@ -126,7 +113,8 @@ export default function ESE3700Page() {
             <div className="content-row__text">
               <p>
                 The full adder bit-slice combines the two primitives. One
-                NAND2 computes AB in parallel with the first XOR2
+                NAND2 (a two-input NAND gate) computes AB in parallel with
+                the first XOR2
                 (P = A &oplus; B). That intermediate P feeds both the sum
                 path (a second XOR2 producing S = P &oplus; C<sub>in</sub>)
                 and the carry path, where two right-hand NAND2 cells
@@ -135,9 +123,49 @@ export default function ESE3700Page() {
               <p style={{ marginTop: "1rem" }}>
                 Sharing P between sum and carry is what makes this topology
                 efficient: the most expensive intermediate is computed once
-                and reused. Eight of these bit-slices (plus a half adder at
-                bit 0) make up the full 8-bit ripple-carry adder.
+                and reused. Eight of these bit-slices are what make up the
+                adder above.
               </p>
+            </div>
+          </div>
+        </ScrollReveal>
+
+        {/* Two XOR2 implementations: the optimization */}
+        <ScrollReveal tag="p">
+          That bit-slice leans on an XOR2, so the last decision was which
+          XOR2 to actually build it from. (Several alternative sum and carry
+          topologies were explored and rejected along the way; that analysis
+          is in the full report.) Two candidates were carried forward and
+          compared head-to-head at the full 8-bit system level:
+        </ScrollReveal>
+
+        <ScrollReveal>
+          <div className="media-row">
+            <div className="media-block">
+              <img
+                src="/assets/img/XOR2_nand.png"
+                alt="Baseline XOR2 cell built from four NAND2 gates"
+                loading="lazy"
+              />
+              <div className="media-block__caption">
+                <strong>Baseline:</strong> four-NAND2 XOR2, sixteen
+                transistors (16 T). Every
+                node fully restored, easy to analyze, conservative.
+              </div>
+            </div>
+            <div className="media-block">
+              <img
+                src="/assets/img/XOR2_min.png"
+                alt="Transistor-level schematic of the optimized transmission-gate XOR2 cell with output buffer"
+                loading="lazy"
+              />
+              <div className="media-block__caption">
+                <strong>Optimization:</strong> transmission-gate (TG) XOR2 with
+                two-inverter output buffer (10 T). Same logic, 40% fewer
+                transistors, and a shorter signal path. The buffer restores
+                the TG&apos;s voltage output to a full rail-to-rail logic
+                level before the next stage.
+              </div>
             </div>
           </div>
         </ScrollReveal>
@@ -145,6 +173,14 @@ export default function ESE3700Page() {
         {/* SPICE comparison plot */}
         <ScrollReveal tag="h2" id="spice-results">
           SPICE Results
+        </ScrollReveal>
+        <ScrollReveal tag="p">
+          Both designs were simulated across three transitions: an
+          all-zeros to all-ones rising edge, the reverse falling edge, and a
+          full carry ripple (255 + 1) that forces a carry to propagate
+          through all eight bit-slices. That last case is the worst case for
+          any ripple-carry adder, and it is the one that sets the maximum
+          operating frequency.
         </ScrollReveal>
         <ScrollReveal>
           <div className="media-block media-block--full-width">
@@ -160,6 +196,19 @@ export default function ESE3700Page() {
               settles 44 ps earlier.
             </div>
           </div>
+        </ScrollReveal>
+        <ScrollReveal tag="p">
+          The two cells trade wins by transition type. On the rising edge the
+          TG-XOR is actually slower, 60.8 ps against the baseline&apos;s
+          38.0 ps, because the transmission gate passes a weak high that the
+          output buffer then has to restore. On the falling edge the two are
+          within 1.4 ps of each other. The result that matters is the bottom
+          row: on full carry propagation the TG-XOR settles in 116.3 ps
+          versus the baseline&apos;s 160.4 ps, a 44.1 ps (27%) reduction.
+          Because carry propagation sets the adder&apos;s maximum operating
+          frequency, winning that worst case is what makes the optimized cell
+          the better choice, even though it gives up ground on the
+          non-critical rising transition.
         </ScrollReveal>
 
         {/* Headline numbers */}
@@ -210,10 +259,11 @@ export default function ESE3700Page() {
               The most useful thing I learned on this project was not the
               topology exploration, it was what happens when your analytical
               model disagrees with simulation. Elmore delay predicted that
-              widening the NAND2 PMOS to 2&times;W<sub>min</sub> would cut
+              widening the NAND2 PMOS (p-channel transistor) to
+              2&times;W<sub>min</sub> would cut
               pull-up delay roughly in half when driving the TG-XOR2 input.
               SPICE said the opposite: sizing up actually made carry
-              propagation worse. The first-order RC model captures the
+              propagation worse. The first-order RC (resistance-capacitance) model captures the
               resistance drop from a wider PMOS but not the extra capacitance
               added to internal nodes. I reverted to minimum-sized transistors
               everywhere. The numbers above come from that version.
@@ -376,8 +426,9 @@ export default function ESE3700Page() {
         <ScrollReveal tag="p">
           A synchronous 16&times;4 SRAM (16 words of 4 bits) in the same
           22nm process, targeting at least 500 MHz operation on a single
-          clock input. The design spans the full memory system: a 6T bit
-          cell, non-overlapping clock generation, row and column decoders,
+          clock input. The design spans the full memory system: a 6T
+          (six-transistor) bit cell, non-overlapping clock generation, row
+          and column decoders,
           sense amplifiers, column drivers, and a voltage midpoint
           reference. It is graded on a figure of merit that combines
           bitcell area, power, and delay squared, so every sub-block has
@@ -391,14 +442,15 @@ export default function ESE3700Page() {
           The full memory fits on a single schematic. Address inputs
           A<sub>0</sub>&ndash;A<sub>3</sub> are latched and fed through a
           4-to-16 row decoder gated by &phi;<sub>2</sub>, driving sixteen
-          word-lines into the 16&times;4 bitcell array. Four column drivers
-          precharge BL/BLb during &phi;<sub>1</sub> and drive writes during
-          &phi;<sub>2</sub>; four isolated latch-type sense amps are armed
-          by SAE = delayed(&phi;<sub>2</sub>&middot;Wr) and resolve reads
-          onto a per-column bus shared with the write path. A two-phase
-          non-overlapping clock generator takes the single external Clk and
-          produces the two phases that keep precharge and access strictly
-          separated.
+          word-lines (WL) into the 16&times;4 bitcell array. Four column
+          drivers precharge BL/BLb (the bit-line pair) during
+          &phi;<sub>1</sub> and drive writes during &phi;<sub>2</sub>; four
+          isolated latch-type sense amps are armed by SAE (sense-amp enable),
+          a delayed combination of &phi;<sub>2</sub> and the write signal Wr,
+          and resolve reads onto a per-column bus shared with the write path.
+          A two-phase non-overlapping clock generator takes the single
+          external clock (Clk) and produces the two phases that keep
+          precharge and access strictly separated.
         </ScrollReveal>
 
         <ScrollReveal>
@@ -409,9 +461,10 @@ export default function ESE3700Page() {
               loading="lazy"
             />
             <div className="media-block__caption">
-              Top-level schematic. All control signals (PCHb, SAE, WrEn,
-              the inverted Wr) come from the two-phase clock and the Wr
-              fanout network along the bottom of the diagram.
+              Top-level schematic. All control signals (PCHb, the precharge
+              line; SAE; WrEn, the write enable; and the inverted Wr) come
+              from the two-phase clock and the Wr fanout network along the
+              bottom of the diagram.
             </div>
           </div>
         </ScrollReveal>
@@ -425,6 +478,35 @@ export default function ESE3700Page() {
           isolated latch-type pair armed by a &phi;<sub>2</sub>-derived
           SAE, so it only fires once the bitline differential has developed
           past its offset. Every other block exists to feed these two.
+        </ScrollReveal>
+
+        {/* Foundational building block: the 6T bitcell */}
+        <ScrollReveal tag="h2" id="bitcell">
+          The 6T Bitcell
+        </ScrollReveal>
+        <ScrollReveal tag="p">
+          The whole array is sixteen by four of one cell. Two cross-coupled
+          inverters hold the bit; two word-line-gated access transistors
+          connect it to BL/BLb. The 4:2:1 PD:AX:PU (pull-down : access :
+          pull-up) width ratio is what lets a read happen without flipping
+          the stored value while a write can
+          still overpower it. The report sizes and walks through every block
+          built around it.
+        </ScrollReveal>
+        <ScrollReveal>
+          <div className="media-block media-block--full-width">
+            <img
+              src="/assets/img/p2_bitcell.png"
+              alt="6T SRAM bitcell schematic: two cross-coupled inverters storing the bit, two word-line-gated access transistors connecting to BL and BLb, with the packaged Bitcell symbol on the right"
+              loading="lazy"
+            />
+            <div className="media-block__caption">
+              The 6T bitcell: a cross-coupled inverter pair for storage plus
+              two word-line-gated access transistors onto BL/BLb. Width ratio
+              PD:AX:PU = 4:2:1 (88 nm : 44 nm : 22 nm). On the right, the cell
+              packaged as the symbol tiled across the array.
+            </div>
+          </div>
         </ScrollReveal>
 
         {/* One full cycle */}
@@ -651,8 +733,9 @@ export default function ESE3700Page() {
               This page is the highlight reel. The full report goes through
               every sub-block in detail: the 6T bitcell sizing, the
               two-phase clock circuit, the 4-to-16 decoder, the column
-              driver, the isolated latch-type sense amp, the RdWr I/O
-              block, the six timing invariants that guarantee correct
+              driver, the isolated latch-type sense amp, the read/write
+              input/output (I/O) block, the six timing invariants that
+              guarantee correct
               operation, per-stage critical-path tables for both read and
               write, and the full figure-of-merit derivation.
             </p>
@@ -687,7 +770,8 @@ export default function ESE3700Page() {
               already cover the datapath and storage halves of a digital
               system, and wrapping them together with a small controller
               and a few logical operations would turn them into a simple
-              ALU. A possible follow-on if I come back to this.
+              arithmetic logic unit (ALU). A possible follow-on if I come
+              back to this.
             </em>
           </p>
         </ScrollReveal>
