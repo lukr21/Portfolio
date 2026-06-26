@@ -32,7 +32,7 @@ export const experienceItems: ExperienceItem[] = [
   {
     logo: "/assets/img/subvysion-logo.png",
     logoAlt: "SubVysion logo",
-    company: "SubVysion",
+    company: "SubVysion (YC S26)",
     role: "Hardware Engineer Intern",
     date: "Mar 2026 — Present",
     skills: ["Electrical Design", "Mechanical CAD", "Sensor Integration", "Power Distribution"],
