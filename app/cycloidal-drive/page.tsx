@@ -1,6 +1,14 @@
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 import AutoplayVideo from "@/components/AutoplayVideo";
+import { pageMetadata } from "@/components/meta";
+
+export const metadata = pageMetadata(
+  "Cycloidal Drive",
+  "A 3D-printable cycloidal gearbox in two iterations: a 12:1 proof-of-concept, then a 26:1 redesign for a robotic arm's joints, with steel-ball bearings running in printed PETG raceways.",
+  "/cycloidal-drive",
+  "/assets/img/cycloidal_v1_crosssection.jpg"
+);
 
 export default function CycloidalDrivePage() {
   return (

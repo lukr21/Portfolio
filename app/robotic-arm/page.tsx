@@ -1,6 +1,14 @@
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 import AutoplayVideo from "@/components/AutoplayVideo";
+import { pageMetadata } from "@/components/meta";
+
+export const metadata = pageMetadata(
+  "6-DOF Desktop Robotic Arm",
+  "A solo six-DOF desktop arm spanning the full stack: custom cycloidal drives, 3D-printed bearings, a Python IK solver and trajectory planner, Arduino motor firmware, and a browser-based control interface.",
+  "/robotic-arm",
+  "/assets/img/arm_photo_2473.jpg"
+);
 
 export default function RoboticArmPage() {
   return (

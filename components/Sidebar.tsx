@@ -355,6 +355,18 @@ function FolderTree({
           </li>
         );
       })}
+
+      <li className="file-tree__item">
+        <a
+          href="/assets/Lucas_Krippendorff_Resume.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="file-tree__link"
+          onClick={onLinkClick}
+        >
+          Resume ↗
+        </a>
+      </li>
     </ul>
   );
 }

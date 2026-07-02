@@ -1,5 +1,13 @@
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
+import { pageMetadata } from "@/components/meta";
+
+export const metadata = pageMetadata(
+  "Cat/Dog Image Classifier",
+  "A 4-layer convolutional neural network in PyTorch, trained on 24,000 images to classify cats vs. dogs, reaching 97.8% validation accuracy.",
+  "/classifier",
+  "/assets/img/classifier_training_curves.png"
+);
 
 export default function ClassifierPage() {
   return (

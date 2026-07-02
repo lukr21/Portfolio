@@ -1,6 +1,14 @@
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 import AutoplayVideo from "@/components/AutoplayVideo";
+import { pageMetadata } from "@/components/meta";
+
+export const metadata = pageMetadata(
+  "Ring Shooter Module",
+  "Mechanical design of a dual-stage flywheel ring launcher for FRC 2024 with Team 5557 (BB-Raiders), built for full-field range, fast cycling, and quick pit service.",
+  "/frc-shooter",
+  "/assets/img/frc_shooter_module.jpg"
+);
 
 export default function FrcShooterPage() {
   return (

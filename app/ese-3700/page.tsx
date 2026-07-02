@@ -1,5 +1,13 @@
 import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
+import { pageMetadata } from "@/components/meta";
+
+export const metadata = pageMetadata(
+  "22nm CMOS Datapath & Memory",
+  "Transistor-level design of an 8-bit adder and a 16×4 SRAM array in a 22nm process, from Boolean derivation through Elmore delay modeling and SPICE validation.",
+  "/ese-3700",
+  "/assets/img/p2_toplevel.png"
+);
 
 export default function ESE3700Page() {
   return (
