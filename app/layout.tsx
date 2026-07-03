@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     url: "https://lucaskrippendorff.com",
     siteName: "Lucas Krippendorff",
     type: "website",
-    images: [{ url: "/assets/img/arm_photo_2473.jpg" }],
+    images: [{ url: "/assets/img/og-card.jpg", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
