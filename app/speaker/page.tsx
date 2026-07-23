@@ -322,7 +322,8 @@ export default function SpeakerPage() {
                 loading="lazy"
               />
               <div className="media-block__caption">
-                Visualizer V2: two rows of ten LEDs, green through red
+                Visualizer V2: ten LEDs per channel &mdash; green through red
+                on the assembled board
               </div>
             </div>
           </ScrollReveal>
