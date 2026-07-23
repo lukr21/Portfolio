@@ -4,7 +4,7 @@ import { pageMetadata } from "@/components/meta";
 
 export const metadata = pageMetadata(
   "USB-C Speaker & Discrete Loudness Meter",
-  "A speaker built from the signal up: a custom USB-C amp board that pulls both audio and 12V PD power from one cable, a 10-LED-per-channel loudness ladder built with no driver IC, and a fully custom housing on the way.",
+  "A two-board speaker system running off a single USB-C cable: an amp board that enumerates as a USB sound card and negotiates 12V over PD, and a 20-LED loudness meter built from discrete parts. My first PCB designs. Custom housing in progress.",
   "/speaker",
   "/assets/img/speaker_render_corner_v4.png"
 );
@@ -33,12 +33,12 @@ export default function SpeakerPage() {
           USB-C Speaker &amp; Discrete Loudness Meter
         </h1>
         <p className="project-hero__subtitle">
-          One USB-C cable in, sound out. Nothing between the port and the
-          speaker cone is a module or dev board: a custom amp PCB pulls both
-          the audio stream and 12V of power from a single cable, and a
-          10-LED-per-channel loudness ladder does the job of a driver IC with
-          nothing but transistors, resistors, and hand-derived math. Final
-          destination: everything mounted in a fully custom speaker housing.
+          A two-board speaker system that runs off a single USB-C cable. The
+          amp board enumerates as a USB sound card and negotiates 12V over
+          PD, and the loudness meter drives ten LEDs per channel using
+          discrete transistors instead of a driver IC. These are the first
+          PCBs I designed. The end goal is everything mounted in a custom
+          speaker housing.
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
@@ -81,9 +81,9 @@ export default function SpeakerPage() {
               <h2>The Idea</h2>
               <p>
                 Desktop speakers usually mean a wall adapter, an aux cable, and
-                an amp module from somewhere. I wanted the whole signal path to
-                be mine, and to need exactly one cable. Plug in USB-C and the
-                board enumerates as a sound card, negotiates its own power, and
+                a premade amp module. I wanted to build the whole signal path
+                myself and have it run off one cable: plug in USB-C and the
+                board shows up as a sound card, negotiates its own power, and
                 drives the speakers directly.
               </p>
               <p>
@@ -123,13 +123,12 @@ export default function SpeakerPage() {
           </div>
         </ScrollReveal>
         <ScrollReveal tag="p">
-          The same USB-C connector carries both halves of the product: data
-          lines go to a PCM2704, which shows up to any computer as a class-
-          compliant USB sound card and converts the stream to analog; the
-          power side goes through a CH221K that negotiates 12V from a USB-C PD
-          supply for the amplifier, stepped down to 3.3V for logic by an
-          AMS1117. The loudness meter taps the analog signal right before the
-          speakers.
+          One connector carries everything. The data lines go to a PCM2704,
+          which any computer sees as a class-compliant USB sound card, so no
+          drivers are needed. On the power side, a CH221K requests 12V from a
+          USB-C PD supply for the amplifier, and an AMS1117 steps that down
+          to 3.3V for logic. The loudness meter taps the analog signal right
+          before the speakers.
         </ScrollReveal>
 
         {/* The Amp Board */}
@@ -153,19 +152,17 @@ export default function SpeakerPage() {
             </div>
             <div className="content-row__text">
               <p>
-                The amplifier itself is a TDA7297, a 15W&times;2 class-AB chip
-                running straight off the negotiated 12V rail. The input side
-                is protected the way a real product would be: a polyfuse
-                against overcurrent and an SMBJ15A TVS diode clamping
-                transients on VBUS. A crystal clocks the PCM2704, and volume
-                buttons on-board talk to it directly, since USB audio class
-                handles volume in-stream.
+                The amplifier is a TDA7297, a 15W&times;2 class-AB chip
+                running directly off the 12V rail. Input protection is a
+                polyfuse for overcurrent and an SMBJ15A TVS diode to clamp
+                transients on VBUS. A crystal clocks the PCM2704, and the
+                on-board volume buttons connect straight to it, since USB
+                audio handles volume in the stream.
               </p>
               <p>
-                This schematic is also the first one I ever drew. I did not
-                yet know that net labels tie nets together, so every single
-                connection is a literal drawn wire. It works, and I keep it
-                here unretouched, because it marks where I started.{" "}
+                This is also the first schematic I ever drew. I did not know
+                yet that net labels tie nets together, so every connection is
+                a drawn wire. It works, and I left it unretouched.{" "}
                 <a href="/assets/speaker_amp_schematic.pdf">
                   Schematic PDF &rarr;
                 </a>
@@ -175,9 +172,9 @@ export default function SpeakerPage() {
         </ScrollReveal>
 
         <ScrollReveal tag="p">
-          The board took four fabbed revisions to get right. Having JLCPCB
-          assemble the SMT parts made each spin cheap enough to treat the fab
-          house as a debugging tool.
+          The board went through four fabbed revisions. JLCPCB assembled the
+          SMT parts, so each spin was cheap and fast enough to just order,
+          test, and fix in the next version.
         </ScrollReveal>
 
         <div className="media-row media-row--grid">
@@ -240,10 +237,9 @@ export default function SpeakerPage() {
             </div>
             <div className="content-row__text">
               <p>
-                Layout follows the signal: the noise-sensitive USB data pairs
-                and crystal stay close to the PCM2704 on one side, while the
-                12V power path and the amp&apos;s output traces get the copper
-                they need on the other.
+                The layout follows the signal: the USB data pairs and crystal
+                stay close to the PCM2704 on one side, and the 12V power path
+                and speaker outputs stay on the other.
               </p>
             </div>
           </div>
@@ -262,15 +258,15 @@ export default function SpeakerPage() {
         <ScrollReveal tag="p">
           The second board is a stereo loudness meter: ten LEDs per channel
           that light in sequence as the music gets louder, with the top LED
-          doubling as a clip indicator. The usual way to build this is a $2
-          driver IC. I built it with none: per channel, half an LM358 works as
-          an envelope detector and gain stage, and each LED hangs off its own
-          MMBT3904 with a base divider that sets its turn-on threshold. Seen
-          for what it is, this is a flash ADC: ten threshold stages comparing
-          the same input in parallel, outputting a thermometer code. The
-          twist is that the code is displayed directly as a bar of LEDs
-          instead of being encoded into bits, and the thresholds are spaced
-          for loudness rather than linear voltage.
+          doubling as a clip indicator. Driver ICs exist that do exactly
+          this, but I built it from discrete parts instead. Per channel, half
+          an LM358 works as an envelope detector and gain stage, and each LED
+          has its own MMBT3904 with a base divider that sets its turn-on
+          threshold. Functionally this is a flash ADC: ten threshold stages
+          compare the same input in parallel and output a thermometer code.
+          The difference is that the code drives LEDs directly instead of
+          being encoded into bits, and the thresholds are spaced by loudness
+          rather than equal voltage steps.
         </ScrollReveal>
 
         <ScrollReveal>
@@ -288,11 +284,11 @@ export default function SpeakerPage() {
         </ScrollReveal>
 
         <ScrollReveal tag="p">
-          This is schematic number two, drawn after the amp&apos;s. The
-          improvement is easy to see by scrolling up: net labels instead of
-          wires snaking across the whole sheet, and a signal path that reads
-          left to right in stages. Getting visibly better at exactly this was
-          the reason I picked the project.
+          This is my second schematic, drawn after the amp&apos;s. Compared
+          to the first one it uses net labels instead of drawn wires
+          everywhere, and the signal path reads left to right in stages. The
+          improvement between the two boards is what I picked the project
+          for.
         </ScrollReveal>
 
         <ScrollReveal tag="p">
@@ -344,7 +340,7 @@ export default function SpeakerPage() {
                 loading="lazy"
               />
               <div className="media-block__caption">
-                Back side carries all the SMT stages, keeping the face clean
+                All SMT parts sit on the back, so the front face is just LEDs
               </div>
             </div>
           </ScrollReveal>
@@ -405,13 +401,12 @@ export default function SpeakerPage() {
               Next: The Housing
             </h2>
             <p>
-              Both boards are fabbed and the Dayton CE81PF-8 full-range
-              drivers are picked out and modeled. What&apos;s left is the part
-              you actually see: a custom speaker enclosure that mounts the
-              drivers, the amp, and the LED ladder as its front face. This
-              section will grow into a build log with assembly photos,
-              measurements, and a demo video as the housing comes
-              together.
+              Both boards are fabbed, and the drivers are picked out: Dayton
+              CE81PF-8 full-range units, already modeled in CAD. What&apos;s
+              left is the enclosure that mounts the drivers and both boards,
+              with the LED ladder as the front face. I&apos;ll update this
+              section with photos, measurements, and a demo video as the
+              build progresses.
             </p>
           </div>
         </ScrollReveal>

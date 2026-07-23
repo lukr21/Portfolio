@@ -184,10 +184,10 @@ export default function HomePage() {
                     USB-C Speaker &amp; Loudness Meter
                   </h3>
                   <p className="project-card__excerpt">
-                    A speaker built from the signal up: one USB-C cable carries
-                    both audio and 12V PD power into a custom amp board, and a
-                    20-LED loudness ladder does a driver IC&apos;s job with
-                    discrete transistors and hand-derived thresholds. Custom
+                    Two custom PCBs running off one USB-C cable: an amp board
+                    that shows up as a USB sound card and negotiates 12V over
+                    PD, and a 20-LED loudness meter built from discrete
+                    transistors, no driver IC. My first PCB designs. Custom
                     housing in progress.
                   </p>
                 </div>
