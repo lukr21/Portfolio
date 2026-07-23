@@ -86,6 +86,12 @@ export default function SpeakerPage() {
                 board enumerates as a sound card, negotiates its own power, and
                 drives the speakers directly.
               </p>
+              <p>
+                The other goal was the skill itself: I had never designed a
+                PCB, and I picked this project specifically to learn. KiCad was
+                the obvious tool &mdash; it&apos;s free, and it does everything
+                from schematic capture to the fab files JLCPCB builds from.
+              </p>
             </div>
           </div>
         </ScrollReveal>
@@ -228,8 +234,11 @@ export default function SpeakerPage() {
                 Layout follows the signal: the noise-sensitive USB data pairs
                 and crystal stay close to the PCM2704 on one side, while the
                 12V power path and the amp&apos;s output traces get the copper
-                they need on the other. The full schematic is a two-page
-                read.{" "}
+                they need on the other. The schematic is the very first one I
+                ever drew &mdash; before I learned that net labels tie nets
+                together, so every single connection is a literal drawn wire.
+                It works, and I keep it here unretouched as the starting
+                point the revision strip above climbs away from.{" "}
                 <a href="/assets/speaker_amp_schematic.pdf">
                   Schematic PDF &rarr;
                 </a>
@@ -271,7 +280,8 @@ export default function SpeakerPage() {
             />
             <div className="media-block__caption">
               One channel: envelope detector, &times;2.1 op-amp bus, then ten
-              common-emitter stages with individually sized base dividers
+              common-emitter stages with individually sized base dividers.
+              Schematic number two &mdash; net labels this time, and it shows.
             </div>
           </div>
         </ScrollReveal>
