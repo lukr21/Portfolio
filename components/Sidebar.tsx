@@ -28,6 +28,19 @@ function flattenIds(sections: Section[]): string[] {
 
 const folders: FolderItem[] = [
   {
+    label: "USB-C Speaker",
+    path: "/speaker",
+    sections: [
+      { label: "Overview", id: "" },
+      { label: "The Idea", id: "the-idea" },
+      { label: "The Signal Chain", id: "signal-chain" },
+      { label: "The Amp Board", id: "amp-board" },
+      { label: "The Loudness Ladder", id: "loudness-ladder" },
+      { label: "Design It Yourself", id: "ladder-designer" },
+      { label: "Next: The Housing", id: "whats-next" },
+    ],
+  },
+  {
     label: "22nm CMOS Design",
     path: "/ese-3700",
     sections: [

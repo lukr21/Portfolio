@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loudness Ladder — LED VU Meter</title>
+<style>
+  :root{
+    --bg:#ffffff; --surface:#f7f8fa; --surface2:#eef0f4; --border:#e2e4e9;
+    --text:#1a1a2e; --secondary:#4a4a5a; --muted:#8a8a9a;
+    --orange:#f97316; --orange-dim:#ea580c; --blue:#3b82f6; --green:#16a34a;
+    --radius:12px; --radius-sm:8px;
+    font-size:15px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:20px;background:var(--bg);color:var(--text);
+       font-family:Inter,-apple-system,system-ui,sans-serif;line-height:1.5}
+  h1{font-family:"Space Grotesk",Inter,sans-serif;font-size:1.7rem;font-weight:700;
+     letter-spacing:-.03em;margin:0 0 4px}
+  .sub{color:var(--secondary);margin:0 0 12px;font-size:.92rem;max-width:70ch}
+  .specs{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 18px}
+  .chip{background:var(--surface);border:1px solid var(--border);border-radius:999px;
+        padding:3px 12px;font-size:.78rem;color:var(--secondary);white-space:nowrap}
+  .chip b{color:var(--orange-dim);font-weight:600}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+         padding:16px 18px;margin-bottom:14px;transition:.3s cubic-bezier(.4,0,.2,1)}
+  h2{font-family:"Space Grotesk",Inter,sans-serif;font-size:1.05rem;margin:0 0 12px;
+     font-weight:700;letter-spacing:-.01em}
+  h2 small{font-family:Inter,sans-serif;color:var(--muted);font-weight:400;font-size:.78rem}
+  /* controls */
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px 16px}
+  label.ctl{display:flex;flex-direction:column;font-size:.8rem;color:var(--muted);gap:4px}
+  label.ctl b{color:var(--text);font-weight:500}
+  input[type=number],select{background:#fff;color:var(--text);border:1px solid var(--border);
+    border-radius:var(--radius-sm);padding:6px 9px;font-size:.92rem;width:100%;
+    transition:border-color .2s}
+  input[type=number]:focus,select:focus{outline:none;border-color:var(--orange)}
+  .radios{display:flex;gap:12px;align-items:center;flex-wrap:wrap;padding-top:2px}
+  .radios label{display:flex;gap:5px;align-items:center;color:var(--text);font-size:.86rem;cursor:pointer}
+  .chk{display:flex;gap:6px;align-items:center;font-size:.84rem;color:var(--secondary);cursor:pointer}
+  input[type=radio],input[type=checkbox]{accent-color:var(--orange)}
+  /* LED sim */
+  #ledRow{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding:14px 4px 6px}
+  .ledCell{display:flex;flex-direction:column;align-items:center;gap:4px;width:52px}
+  .led{width:26px;height:26px;border-radius:50%;border:2px solid #d3d7dd;background:var(--surface2);
+       transition:box-shadow .08s, background .08s}
+  .led.na{background:repeating-linear-gradient(45deg,var(--surface2),var(--surface2) 4px,#f3e4e4 4px,#f3e4e4 8px);border-color:#dfc2c2}
+  .ledLbl{font-size:.68rem;color:var(--muted);text-align:center;line-height:1.15}
+  .simCtl{display:flex;align-items:center;gap:14px;margin-top:10px;flex-wrap:wrap}
+  input[type=range]{flex:1;min-width:220px;accent-color:var(--orange)}
+  #simRead{font-variant-numeric:tabular-nums;font-size:.92rem;min-width:280px}
+  #simRead b{color:var(--orange-dim)}
+  /* table */
+  table{border-collapse:collapse;width:100%;font-size:.86rem;font-variant-numeric:tabular-nums}
+  th,td{padding:5px 9px;text-align:right;border-bottom:1px solid var(--border);white-space:nowrap}
+  th{color:var(--muted);font-weight:600;text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  tr.worst td{background:#fff1e6}
+  tr.dead td{color:#a3a3ae;background:#f2f2f4}
+  td small{color:var(--muted)}
+  .tblWrap{overflow-x:auto}
+  .tag{display:inline-block;font-size:.68rem;padding:1px 7px;border-radius:999px;
+       background:var(--orange);color:#fff;margin-left:6px;vertical-align:1px}
+  pre#bom{background:#fff;border:1px solid var(--border);border-radius:var(--radius-sm);
+          padding:10px 12px;font-size:.82rem;white-space:pre-wrap;margin:8px 0 0}
+  button{background:var(--orange);color:#fff;border:0;border-radius:var(--radius-sm);
+         padding:7px 16px;font-size:.88rem;font-weight:600;cursor:pointer;
+         transition:background .2s}
+  button:hover{background:var(--orange-dim)}
+  .note{color:var(--secondary);font-size:.82rem;margin-top:10px}
+  .note b{color:var(--text)}
+  svg text{font-family:Inter,sans-serif}
+  #rcInfo{font-size:.92rem;margin:4px 0 8px}
+  #rcInfo b{color:var(--green)}
+  .svgHead{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .svgHead select{width:auto}
+</style>
+</head>
+<body>
+
+<h1>Loudness Ladder — LED VU Meter</h1>
+<p class="sub">Envelope detector → ×2.1 op amp bus → N common-emitter NPN stages, each with its own R<sub>top</sub>/R<sub>bot</sub> base divider. LEDs light in sequence as loudness rises; the top LED doubles as a clip indicator.</p>
+<div class="specs">
+  <span class="chip">rail <b>+12 V</b></span>
+  <span class="chip">gain <b>×2.1</b> (R<sub>f</sub> 11k / R<sub>g</sub> 10k)</span>
+  <span class="chip">op amp clips <b>10.5 V</b> (V<sub>det</sub> = 5.0 V)</span>
+  <span class="chip">full scale <b>10.5 V</b> bus</span>
+  <span class="chip">V<sub>be</sub> <b>0.65 V</b></span>
+  <span class="chip">V<sub>det</sub> peaks <b>6 V</b></span>
+</div>
+
+<div class="panel">
+  <h2>Design controls</h2>
+  <div class="grid">
+    <label class="ctl"><b>LEDs N (3–20)</b><input id="inN" type="number" min="3" max="20" step="1" value="10"></label>
+    <label class="ctl"><b>Dynamic range (dB below full scale)</b><input id="inDb" type="number" min="3" max="60" step="1" value="30"></label>
+    <label class="ctl"><b>E-series <span id="tolTag" class="tag"></span></b>
+      <select id="inSeries"><option>E12</option><option selected>E24</option><option>E96</option></select></label>
+    <label class="ctl"><b>LED V<sub>f</sub> (V)</b><input id="inVf" type="number" min="1" max="4" step="0.1" value="2.0"></label>
+    <label class="ctl"><b>LED current I<sub>led</sub> (mA)</b><input id="inIled" type="number" min="0.5" max="20" step="0.5" value="3"></label>
+    <label class="ctl"><b>Anchor mode</b>
+      <span class="radios">
+        <label><input type="radio" name="anc" value="fixed" checked> R<sub>top</sub> = 10 k</label>
+        <label><input type="radio" name="anc" value="search"> Search both</label>
+      </span>
+    </label>
+    <label class="chk" style="align-self:end"><input id="inTol" type="checkbox"> Show tolerance shift</label>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Simulation <small>— slide the detector voltage; op amp output = min(2.1·V<sub>det</sub>, 10.5 V)</small></h2>
+  <div id="ledRow"></div>
+  <div class="simCtl">
+    <span style="color:var(--muted);font-size:.85rem">V<sub>det</sub></span>
+    <input id="simSlider" type="range" min="0" max="6" step="0.012" value="0">
+    <span id="simRead"></span>
+  </div>
+</div>
+
+<div class="panel">
+  <h2>Divider design table <small>— worst-error stage highlighted</small></h2>
+  <div class="tblWrap"><table id="tbl"></table></div>
+</div>
+
+<div class="panel">
+  <h2>Collector resistor &amp; BOM</h2>
+  <div id="rcInfo"></div>
+  <pre id="bom"></pre>
+  <div style="margin-top:10px"><button id="copyBtn">Copy values as text</button> <span id="copyOk" style="color:var(--green);font-size:.85rem"></span></div>
+</div>
+
+<div class="panel">
+  <div class="svgHead"><h2 style="margin:0">One stage + front end</h2>
+    <span style="color:var(--muted);font-size:.85rem">show values for stage</span>
+    <select id="svgStage"></select></div>
+  <div style="overflow-x:auto;margin-top:8px">
+  <svg id="schem" viewBox="0 0 900 330" width="900" height="330" xmlns="http://www.w3.org/2000/svg">
+    <style>
+      .w{stroke:#8a8a9a;stroke-width:1.6;fill:none}
+      .comp{stroke:#1a1a2e;stroke-width:1.6;fill:none}
+      .box{stroke:#f97316;stroke-width:1.6;fill:none}
+      .lbl{fill:#1a1a2e;font-size:12px}
+      .val{fill:#ea580c;font-size:12px;font-weight:600}
+      .nd{fill:#16a34a}
+      .dimt{fill:#8a8a9a;font-size:11px}
+    </style>
+    <!-- ===== envelope detector ===== -->
+    <text x="14" y="164" class="lbl">Audio</text><text x="14" y="178" class="lbl">in</text>
+    <path class="w" d="M46 172 H70"/>
+    <path class="comp" d="M70 158 V186 M78 158 V186"/>
+    <text x="56" y="150" class="lbl">C1</text><text x="56" y="205" class="dimt">1 µF</text>
+    <path class="w" d="M78 172 H108"/>
+    <path class="comp" d="M108 160 L132 172 L108 184 Z M132 160 V184 M128 160 H136 M128 184 H136"/>
+    <text x="100" y="150" class="lbl">D1</text><text x="80" y="140" class="dimt">BAT85</text>
+    <path class="w" d="M136 172 H290 M290 172 V162 H310"/>
+    <circle class="nd" cx="170" cy="172" r="3"/><circle class="nd" cx="225" cy="172" r="3"/>
+    <text x="148" y="132" class="val" font-size="13">V_det</text>
+    <path class="w" d="M170 172 V220"/>
+    <path class="comp" d="M158 220 H182 M158 228 H182"/>
+    <path class="w" d="M170 228 V252"/>
+    <text x="108" y="224" class="lbl">C2</text><text x="108" y="237" class="dimt">10 µF</text>
+    <path class="w" d="M225 172 V196"/>
+    <rect class="box" x="215" y="196" width="20" height="40"/>
+    <path class="w" d="M225 236 V252"/>
+    <text x="241" y="212" class="lbl">R_bl</text><text x="241" y="225" class="dimt">100k</text>
+    <!-- ===== op amp ×2.1 ===== -->
+    <path class="comp" d="M310 146 L310 198 L368 172 Z"/>
+    <text x="315" y="166" class="lbl" font-size="11">+</text>
+    <text x="315" y="187" class="lbl" font-size="11">−</text>
+    <text x="324" y="178" class="val">×2.1</text>
+    <path class="w" d="M376 172 V216 M376 216 H352 M316 216 H290 M290 216 V182 H310"/>
+    <rect class="box" x="316" y="208" width="36" height="16"/>
+    <text x="356" y="205" class="lbl">Rf <tspan class="val">11 kΩ</tspan></text>
+    <circle class="nd" cx="290" cy="216" r="3"/>
+    <path class="w" d="M290 216 V220"/>
+    <rect class="box" x="280" y="220" width="20" height="24"/>
+    <path class="w" d="M290 244 V252"/>
+    <text x="248" y="240" class="lbl" font-size="11">Rg</text><text x="244" y="252" class="val" font-size="11">10k</text>
+    <path class="w" d="M368 172 H400"/>
+    <circle class="nd" cx="376" cy="172" r="3"/>
+    <text x="366" y="140" class="val" font-size="13">V_env (bus)</text>
+    <!-- ===== divider ===== -->
+    <rect class="box" x="400" y="162" width="56" height="20"/>
+    <text x="400" y="150" class="lbl">R_top</text><text x="400" y="205" class="val" id="svgRtop">10 kΩ</text>
+    <path class="w" d="M456 172 H540"/>
+    <circle class="nd" cx="500" cy="172" r="3"/>
+    <text x="492" y="160" class="lbl">base</text>
+    <path class="w" d="M500 172 V196"/>
+    <rect class="box" x="490" y="196" width="20" height="40"/>
+    <path class="w" d="M500 236 V252"/>
+    <text x="515" y="212" class="lbl">R_bot</text><text x="515" y="225" class="val" id="svgRbot">—</text>
+    <!-- ===== transistor ===== -->
+    <circle class="comp" cx="565" cy="172" r="26"/>
+    <path class="comp" d="M540 172 H555 M555 156 V188 M555 165 L578 149 M555 179 L578 195"/>
+    <path class="comp" d="M570 189 L578 195 L569 197 Z" fill="#1a1a2e"/>
+    <text x="597" y="176" class="lbl">Q<tspan id="svgQn">k</tspan> (2N3904)</text>
+    <path class="w" d="M578 195 V252"/>
+    <path class="w" d="M578 149 V132"/>
+    <path class="comp" d="M566 132 H590 M578 132 L566 108 H590 L578 132 Z" transform="rotate(180 578 120)"/>
+    <path class="comp" d="M566 108 H590"/>
+    <path class="comp" d="M592 118 l12 -8 M604 110 l-5 1 M604 110 l-1 5 M594 106 l12 -8 M606 98 l-5 1 M606 98 l-1 5"/>
+    <text x="530" y="122" class="lbl">LED</text>
+    <path class="w" d="M578 108 V86"/>
+    <rect class="box" x="568" y="46" width="20" height="40"/>
+    <text x="594" y="62" class="lbl">R_c</text><text x="594" y="76" class="val" id="svgRc">—</text>
+    <path class="w" d="M578 46 V28 M562 28 H594"/>
+    <text x="600" y="32" class="val">+12 V</text>
+    <!-- grounds -->
+    <g class="w">
+      <path d="M158 252 H182 M163 257 H177 M168 262 H172" transform="translate(2,0)"/>
+      <path d="M213 252 H237 M218 257 H232 M223 262 H227"/>
+      <path d="M278 252 H302 M283 257 H297 M288 262 H292"/>
+      <path d="M488 252 H512 M493 257 H507 M498 262 H502"/>
+      <path d="M566 252 H590 M571 257 H585 M576 262 H580"/>
+    </g>
+    <text x="20" y="300" class="dimt">C1 couples audio, D1 rectifies, C2 holds the peak. Only R_bleed discharges C2 (decay ≈ 1 s) — the ×2.1 op amp buffers the bus, so the dividers don't load the detector. Output clips at 10.5 V (V_det = 5 V). One of N stages shown.</text>
+  </svg>
+  </div>
+  <p class="note" id="loadNote"></p>
+</div>
+
+<script>
+"use strict";
+/* ===== fixed project constants ===== */
+const VCC=12, VBE=0.65, GAIN=2.1, VCLIP=10.5, VFS=10.5, VDET_MAX=6, RF=11000, RG=10000;
+
+/* ================= MATH-BEGIN ================= */
+const E_TABLES = {
+  E12:[1.0,1.2,1.5,1.8,2.2,2.7,3.3,3.9,4.7,5.6,6.8,8.2],
+  E24:[1.0,1.1,1.2,1.3,1.5,1.6,1.8,2.0,2.2,2.4,2.7,3.0,3.3,3.6,3.9,4.3,4.7,5.1,5.6,6.2,6.8,7.5,8.2,9.1],
+  E96:[1.00,1.02,1.05,1.07,1.10,1.13,1.15,1.18,1.21,1.24,1.27,1.30,1.33,1.37,1.40,1.43,1.47,1.50,
+       1.54,1.58,1.62,1.65,1.69,1.74,1.78,1.82,1.87,1.91,1.96,2.00,2.05,2.10,2.15,2.21,2.26,2.32,
+       2.37,2.43,2.49,2.55,2.61,2.67,2.74,2.80,2.87,2.94,3.01,3.09,3.16,3.24,3.32,3.40,3.48,3.57,
+       3.65,3.74,3.83,3.92,4.02,4.12,4.22,4.32,4.42,4.53,4.64,4.75,4.87,4.99,5.11,5.23,5.36,5.49,
+       5.62,5.76,5.90,6.04,6.19,6.34,6.49,6.65,6.81,6.98,7.15,7.32,7.50,7.68,7.87,8.06,8.25,8.45,
+       8.66,8.87,9.09,9.31,9.53,9.76]
+};
+const TOL = {E12:10, E24:5, E96:1};
+
+function eList(series, lo, hi){
+  const out=[];
+  for(let d=0; d<=7; d++){
+    const p=Math.pow(10,d);
+    for(const m of E_TABLES[series]){
+      const v=Math.round(m*p*1e6)/1e6;
+      if(v>=lo && v<=hi) out.push(v);
+    }
+  }
+  return out.sort((a,b)=>a-b);
+}
+
+function nearestE(series, val){
+  if(!(val>0)) return NaN;
+  val=Math.min(Math.max(val,10),1e7);
+  const d0=Math.floor(Math.log10(val));
+  let best=NaN, bd=Infinity;
+  for(let d=d0-1; d<=d0+1; d++){
+    const p=Math.pow(10,d);
+    for(const m of E_TABLES[series]){
+      const c=m*p;
+      if(c<10 || c>1e7) continue;
+      const dist=Math.abs(Math.log(c/val));
+      if(dist<bd){bd=dist;best=c;}
+    }
+  }
+  return best;
+}
+
+// Log-spaced ideal thresholds: stage N at 0 dB (= Vfs), stage 1 at -dbRange.
+function idealThresholds(cfg){
+  const out=[];
+  for(let k=1;k<=cfg.N;k++){
+    const db=(cfg.N===1)?0:(-cfg.dbRange + (k-1)*cfg.dbRange/(cfg.N-1));
+    out.push({k, db, v:cfg.Vfs*Math.pow(10,db/20)});
+  }
+  return out;
+}
+
+function designDivider(r, series, anchor){
+  if(!(r>0 && r<1)) return null;
+  if(anchor==='fixed'){
+    const rtop=10000;
+    return {rtop, rbot:nearestE(series, rtop*r/(1-r))};
+  }
+  const tops=eList(series,1000,100000);
+  const bots=eList(series,10,1e7);
+  let best=null, bestScore=Infinity;
+  for(const rtop of tops){
+    const ideal=rtop*r/(1-r);
+    if(ideal<10 || ideal>1e7) continue;
+    let lo=0, hi=bots.length-1;
+    while(lo<hi){const mid=(lo+hi)>>1; if(bots[mid]<ideal) lo=mid+1; else hi=mid;}
+    for(const idx of [lo-1,lo]){
+      if(idx<0||idx>=bots.length) continue;
+      const rbot=bots[idx];
+      const ratio=rbot/(rtop+rbot);
+      const err=Math.abs(ratio/r-1);
+      const score=err + 1e-4*Math.abs(Math.log10((rtop+rbot)/20000));
+      if(score<bestScore){bestScore=score;best={rtop,rbot};}
+    }
+  }
+  return best;
+}
+
+// cfg = {N, dbRange, series, anchor, Vfs, Vbe, Vclip, Vcc, Vf, Iled}
+function design(cfg){
+  const stages=idealThresholds(cfg).map(t=>{
+    const feasible=t.v>cfg.Vbe*(1+1e-9);
+    if(!feasible) return {...t, feasible:false};
+    const r=cfg.Vbe/t.v;
+    const dv=designDivider(r, cfg.series, cfg.anchor);
+    if(!dv) return {...t, feasible:false};
+    const vAct=cfg.Vbe*(dv.rtop+dv.rbot)/dv.rbot;
+    const tol=TOL[cfg.series]/100;
+    return {...t, feasible:true, rtop:dv.rtop, rbot:dv.rbot,
+            rbotIdeal:(cfg.anchor==='fixed')?10000*r/(1-r):null,
+            vAct, errPct:(vAct-t.v)/t.v*100,
+            dbAct:20*Math.log10(vAct/cfg.Vfs),
+            vMin:cfg.Vbe*(1 + dv.rtop*(1-tol)/(dv.rbot*(1+tol))),
+            vMax:cfg.Vbe*(1 + dv.rtop*(1+tol)/(dv.rbot*(1-tol))),
+            clipped:vAct>cfg.Vclip+1e-9};
+  });
+  const drop=cfg.Vcc-cfg.Vf-0.2;
+  const rcVal=nearestE(cfg.series, drop/cfg.Iled);
+  return {stages, rc:{ideal:drop/cfg.Iled, val:rcVal, iAct:drop/rcVal}};
+}
+/* ================= MATH-END ================= */
+
+/* ---------- formatting ---------- */
+function fmtR(v){
+  if(!isFinite(v)) return '—';
+  let s,u;
+  if(v>=1e6){s=v/1e6;u=' MΩ';}
+  else if(v>=1e3){s=v/1e3;u=' kΩ';}
+  else{s=v;u=' Ω';}
+  const str=(s>=100)?s.toFixed(0):(s>=10)?(+s.toFixed(1)).toString():(+s.toFixed(2)).toString();
+  return str+u;
+}
+function fmtV(v){ return (v>=10?v.toFixed(2):v.toFixed(3))+' V'; }
+function fmtDb(d){ return (d>-0.005&&d<0.005?'0.0':d.toFixed(1))+' dB'; }
+
+/* ---------- DOM ---------- */
+const $=id=>document.getElementById(id);
+const els={N:$('inN'),Db:$('inDb'),Vf:$('inVf'),Iled:$('inIled'),Series:$('inSeries'),Tol:$('inTol'),
+           slider:$('simSlider'),ledRow:$('ledRow'),simRead:$('simRead'),
+           tbl:$('tbl'),rcInfo:$('rcInfo'),bom:$('bom'),
+           svgStage:$('svgStage'),tolTag:$('tolTag'),loadNote:$('loadNote')};
+let D=null, CFG=null;
+
+function readCfg(){
+  const clamp=(x,a,b)=>Math.min(Math.max(x,a),b);
+  return {
+    N:clamp(Math.round(+els.N.value)||10,3,20),
+    dbRange:clamp(+els.Db.value||30,3,60),
+    series:els.Series.value,
+    anchor:document.querySelector('input[name=anc]:checked').value,
+    Vf:clamp(+els.Vf.value||2,1,4),
+    Iled:clamp(+els.Iled.value||3,0.5,20)/1000,
+    Vfs:VFS, Vbe:VBE, Vclip:VCLIP, Vcc:VCC
+  };
+}
+
+function zoneColor(k,N){
+  if(k<=Math.ceil(0.6*N)) return {on:'#16a34a',glow:'rgba(22,163,74,.55)'};
+  if(k<=Math.ceil(0.85*N)) return {on:'#eab308',glow:'rgba(234,179,8,.55)'};
+  return {on:'#ef4444',glow:'rgba(239,68,68,.55)'};
+}
+
+function recompute(){
+  CFG=readCfg();
+  D=design(CFG);
+  els.tolTag.textContent='±'+TOL[CFG.series]+'%';
+  renderTable(); renderRcBom(); renderSim(); renderSvgSelect(); updateSvg(); renderNote();
+}
+
+function renderTable(){
+  const showTol=els.Tol.checked, tol=TOL[CFG.series];
+  let worst=-1, worstErr=-1;
+  D.stages.forEach((s,i)=>{ if(s.feasible&&!s.clipped&&Math.abs(s.errPct)>worstErr){worstErr=Math.abs(s.errPct);worst=i;} });
+  let h='<tr><th>Stage</th><th>Ideal V<sub>th</sub></th><th>Ideal dB</th><th>R<sub>top</sub></th><th>R<sub>bot</sub></th>'+
+        '<th>Actual V<sub>th</sub></th><th>Error %</th>'+
+        (showTol?'<th>V<sub>th</sub> @ ±'+tol+'% <small>(min…max)</small></th>':'')+'</tr>';
+  D.stages.forEach((s,i)=>{
+    if(!s.feasible){
+      h+='<tr class="dead"><td>'+s.k+'</td><td>'+fmtV(s.v)+'</td><td>'+fmtDb(s.db)+'</td>'+
+         '<td colspan="'+(showTol?5:4)+'">— below V<sub>be</sub>, never lights —</td></tr>';
+      return;
+    }
+    const ideal=s.rbotIdeal?'<br><small>ideal '+fmtR(s.rbotIdeal)+'</small>':'';
+    const cls=i===worst?' class="worst"':(s.clipped?' class="dead"':'');
+    const tag=i===worst?' <span class="tag">worst</span>':(s.clipped?' <small>&gt; clip</small>':'');
+    h+='<tr'+cls+'><td>'+s.k+tag+'</td>'+
+       '<td>'+fmtV(s.v)+'</td><td>'+fmtDb(s.db)+'</td>'+
+       '<td>'+fmtR(s.rtop)+'</td><td>'+fmtR(s.rbot)+ideal+'</td>'+
+       '<td>'+fmtV(s.vAct)+' <small>('+fmtDb(s.dbAct)+')</small></td>'+
+       '<td>'+(s.errPct>=0?'+':'')+s.errPct.toFixed(2)+'%</td>'+
+       (showTol?'<td>'+fmtV(s.vMin)+' … '+fmtV(s.vMax)+'</td>':'')+'</tr>';
+  });
+  els.tbl.innerHTML=h;
+}
+
+function renderRcBom(){
+  els.rcInfo.innerHTML='R<sub>c</sub> ideal = '+fmtR(D.rc.ideal)+' → standard <b>'+fmtR(D.rc.val)+
+    '</b> ⇒ actual I<sub>led</sub> ≈ <b>'+(D.rc.iAct*1000).toFixed(2)+' mA</b>'+
+    ' &nbsp;<small style="color:var(--muted)">((12 − V<sub>f</sub> − 0.2 V) / I<sub>led</sub>, ×'+CFG.N+')</small>';
+  els.bom.textContent=bomText();
+}
+
+function bomText(){
+  const live=D.stages.filter(s=>s.feasible);
+  const counts=new Map();
+  live.forEach(s=>{
+    counts.set(s.rtop,(counts.get(s.rtop)||0)+1);
+    counts.set(s.rbot,(counts.get(s.rbot)||0)+1);
+  });
+  counts.set(D.rc.val,(counts.get(D.rc.val)||0)+CFG.N);
+  counts.set(RF,(counts.get(RF)||0)+1);
+  counts.set(RG,(counts.get(RG)||0)+1);
+  const g=Math.ceil(0.6*CFG.N), y=Math.ceil(0.85*CFG.N);
+  let t='BILL OF MATERIALS  ('+CFG.series+', ±'+TOL[CFG.series]+'%)\n';
+  t+='  '+CFG.N+'× NPN transistor (2N3904 / BC547)\n';
+  t+='  '+CFG.N+'× LED  ('+g+' green, '+(y-g)+' yellow, '+(CFG.N-y)+' red)\n';
+  t+='  '+CFG.N+'× collector resistor: '+fmtR(D.rc.val)+'\n';
+  t+='  '+(2*live.length)+'× divider resistors ('+live.length+' stages built)\n';
+  t+='  1× op amp (single-supply, e.g. MCP6001/LM358): Rf = 11 kΩ, Rg = 10 kΩ (gain ×2.1)\n';
+  t+='Unique resistor values ('+counts.size+'):\n';
+  [...counts.entries()].sort((a,b)=>a[0]-b[0]).forEach(([v,c])=>{ t+='  '+String(c).padStart(3)+'×  '+fmtR(v)+'\n'; });
+  t+='Front end: 1 µF film cap, BAT85 Schottky, 10 µF cap, 100 kΩ bleed\n';
+  return t;
+}
+
+/* ---------- sim ---------- */
+function renderSim(){
+  let h='';
+  D.stages.forEach(s=>{
+    const lbl=!s.feasible?'n/a':(s.clipped?s.vAct.toFixed(2)+'V ✕':s.vAct.toFixed(2)+'V');
+    h+='<div class="ledCell"><div class="led'+(s.feasible?'':' na')+'" data-k="'+s.k+'"></div>'+
+       '<div class="ledLbl"'+(s.clipped?' style="color:#b45309"':'')+'>'+s.k+'<br>'+lbl+'</div></div>';
+  });
+  els.ledRow.innerHTML=h;
+  updateSim();
+}
+function updateSim(){
+  const vdet=+els.slider.value;
+  const raw=vdet*GAIN;
+  const vbus=Math.min(raw, VCLIP);
+  let lit=0;
+  document.querySelectorAll('#ledRow .led').forEach(el=>{
+    const k=+el.dataset.k, s=D.stages[k-1], z=zoneColor(k,CFG.N);
+    if(s.feasible && vbus>=s.vAct){
+      el.style.background=z.on; el.style.borderColor=z.on;
+      el.style.boxShadow='0 0 12px 3px '+z.glow; lit++;
+    }else{
+      el.style.background=''; el.style.borderColor=''; el.style.boxShadow='';
+    }
+  });
+  const db=vbus>0?20*Math.log10(vbus/VFS):-Infinity;
+  els.simRead.innerHTML='V<sub>det</sub> = <b>'+vdet.toFixed(2)+' V</b> → V<sub>env</sub> = <b>'+
+    vbus.toFixed(2)+' V</b> ('+(isFinite(db)?db.toFixed(1)+' dB':'−∞')+')'+
+    ' — <b>'+lit+'</b> / '+CFG.N+' lit'+
+    ' <span style="color:#ef4444;font-weight:600;visibility:'+(raw>VCLIP+1e-9?'visible':'hidden')+'">CLIPPING</span>';
+}
+
+/* ---------- SVG ---------- */
+function renderSvgSelect(){
+  const cur=+els.svgStage.value||1;
+  let h='';
+  D.stages.forEach(s=>{ if(s.feasible) h+='<option value="'+s.k+'">'+s.k+'</option>'; });
+  els.svgStage.innerHTML=h||'<option value="0">—</option>';
+  const want=D.stages[cur-1]&&D.stages[cur-1].feasible?cur:(D.stages.find(s=>s.feasible)||{k:0}).k;
+  els.svgStage.value=want;
+}
+function updateSvg(){
+  const k=+els.svgStage.value, s=D.stages[k-1];
+  $('svgQn').textContent=k||'k';
+  $('svgRtop').textContent=s&&s.feasible?fmtR(s.rtop):'—';
+  $('svgRbot').textContent=s&&s.feasible?fmtR(s.rbot):'—';
+  $('svgRc').textContent=fmtR(D.rc.val);
+}
+
+function renderNote(){
+  const live=D.stages.filter(s=>s.feasible);
+  const dead=D.stages.filter(s=>!s.feasible).map(s=>s.k);
+  const clipped=D.stages.filter(s=>s.clipped).map(s=>s.k);
+  let sums='';
+  if(live.length){
+    const tot=live.map(s=>s.rtop+s.rbot);
+    const iMax=live.reduce((a,s)=>a+VCLIP/(s.rtop+s.rbot),0);
+    sums=' R<sub>top</sub>+R<sub>bot</sub> spans '+fmtR(Math.min(...tot))+'–'+fmtR(Math.max(...tot))+
+         '; the op amp sources ≈ '+(iMax*1000).toFixed(2)+' mA into the dividers at full scale.';
+  }
+  /* turn-on order check: worst-case tolerance must not let LED k+1 fire before LED k */
+  let order='';
+  if(live.length>1){
+    let minGap=Infinity;
+    for(let i=1;i<live.length;i++) minGap=Math.min(minGap,(live[i].vMin-live[i-1].vMax)/live[i-1].vAct*100);
+    order = minGap>=0
+      ? ' <b style="color:var(--green)">Turn-on order guaranteed</b> even at worst-case ±'+TOL[CFG.series]+'% (min margin '+minGap.toFixed(1)+'%).'
+      : ' <b style="color:#ef4444">Turn-on order NOT guaranteed:</b> worst-case ±'+TOL[CFG.series]+'% lets adjacent LEDs swap (margin '+minGap.toFixed(1)+'%) — use a tighter series or hand-match parts.';
+  }
+  let skip='';
+  if(dead.length) skip+=' Stage'+(dead.length>1?'s':'')+' '+dead.join(', ')+' sit'+(dead.length>1?'':'s')+
+    ' below V<sub>be</sub> and never light'+(dead.length>1?'':'s')+' (ignored, by design).';
+  if(clipped.length) skip+=' Stage'+(clipped.length>1?'s':'')+' '+clipped.join(', ')+' land'+(clipped.length>1?'':'s')+
+    ' above the 10.5 V clip and never light'+(clipped.length>1?'':'s')+'.';
+  els.loadNote.innerHTML='<b>Loading:</b> the op amp buffers V<sub>env</sub>, so the dividers see a stiff source and don\'t load '+
+    'the detector or each other; only R<sub>bleed</sub> discharges C2 (τ ≈ 1 s). Each base draws I<sub>c</sub>/β from its divider '+
+    'when on — the E-series snap dominates the error budget regardless.'+order+sums+skip+
+    ' Resistors ±'+TOL[CFG.series]+'% ('+CFG.series+'); V<sub>be</sub> drifts ≈ −2 mV/°C, shifting all thresholds together.';
+}
+
+/* ---------- copy ---------- */
+function copyText(){
+  let t='LOUDNESS LADDER VU METER — '+CFG.N+' LEDs, log '+CFG.dbRange+' dB range, '+
+        '+12 V rail, op amp x2.1 (Rf 11k / Rg 10k, clips 10.5 V), full scale 10.5 V bus, Vbe 0.65 V, '+
+        CFG.series+', anchor='+(CFG.anchor==='fixed'?'Rtop=10k fixed':'search both')+'\n\n';
+  t+='Stage | Ideal Vth | Ideal dB | Rtop | Rbot | Actual Vth | Err %\n';
+  D.stages.forEach(s=>{
+    t+= s.feasible
+      ? [s.k, s.v.toFixed(3)+' V', s.db.toFixed(1)+' dB', fmtR(s.rtop), fmtR(s.rbot),
+         s.vAct.toFixed(3)+' V', (s.errPct>=0?'+':'')+s.errPct.toFixed(2)+'%'].join(' | ')+
+        (s.clipped?'  [above clip - never lights]':'')+'\n'
+      : s.k+' | '+s.v.toFixed(3)+' V | '+s.db.toFixed(1)+' dB | below Vbe - never lights\n';
+  });
+  t+='\nRc: '+fmtR(D.rc.val)+' (ideal '+fmtR(D.rc.ideal)+', actual Iled '+(D.rc.iAct*1000).toFixed(2)+' mA)\n\n';
+  t+=bomText();
+  const done=()=>{ $('copyOk').textContent='copied ✓'; setTimeout(()=>$('copyOk').textContent='',1500); };
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(done).catch(()=>fallbackCopy(t,done));
+  } else fallbackCopy(t,done);
+}
+function fallbackCopy(t,done){
+  const ta=document.createElement('textarea');
+  ta.value=t; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.select();
+  try{document.execCommand('copy');done();}catch(e){}
+  document.body.removeChild(ta);
+}
+
+/* ---------- wiring ---------- */
+['inN','inDb','inVf','inIled','inSeries','inTol'].forEach(id=>{
+  $(id).addEventListener('input',recompute);
+});
+document.querySelectorAll('input[name=anc]').forEach(el=>el.addEventListener('change',recompute));
+els.slider.addEventListener('input',updateSim);
+els.svgStage.addEventListener('change',updateSvg);
+$('copyBtn').addEventListener('click',copyText);
+recompute();
+els.slider.value=2.8; updateSim();
+</script>
+</body>
+</html>

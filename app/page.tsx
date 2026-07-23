@@ -166,6 +166,38 @@ export default function HomePage() {
         <div className="projects-grid">
           <ScrollReveal>
             <ProjectCardTilt className="project-card">
+              <Link href="/speaker" style={{ display: "contents" }}>
+                <div className="project-card__img-wrap">
+                  <img
+                    src="/assets/img/speaker_render_corner_v4.png"
+                    alt="USB-C speaker amp PCB render"
+                    className="project-card__img"
+                    loading="lazy"
+                  />
+                  <div className="project-card__overlay" />
+                </div>
+                <div className="project-card__body">
+                  <p className="project-card__tag">
+                    Personal Project &middot; 2026 &middot; In Progress
+                  </p>
+                  <h3 className="project-card__title">
+                    USB-C Speaker &amp; Loudness Meter
+                  </h3>
+                  <p className="project-card__excerpt">
+                    A speaker built from the signal up: one USB-C cable carries
+                    both audio and 12V PD power into a custom amp board, and a
+                    20-LED loudness ladder does a driver IC&apos;s job with
+                    discrete transistors and hand-derived thresholds. Custom
+                    housing in progress.
+                  </p>
+                </div>
+                <span className="project-card__arrow">&rarr;</span>
+              </Link>
+            </ProjectCardTilt>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <ProjectCardTilt className="project-card">
               <Link href="/ese-3700" style={{ display: "contents" }}>
                 <div className="project-card__img-wrap">
                   <img
