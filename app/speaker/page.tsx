@@ -165,7 +165,7 @@ export default function SpeakerPage() {
           house as a debugging tool.
         </ScrollReveal>
 
-        <div className="media-row">
+        <div className="media-row media-row--grid">
           <ScrollReveal>
             <div className="media-block">
               <img
@@ -254,9 +254,12 @@ export default function SpeakerPage() {
           doubling as a clip indicator. The usual way to build this is a $2
           driver IC. I built it with none: per channel, half an LM358 works as
           an envelope detector and gain stage, and each LED hangs off its own
-          MMBT3904 with a base divider that sets its turn-on threshold. The
-          ladder is effectively a 10-level analog-to-display converter made
-          entirely from discrete parts.
+          MMBT3904 with a base divider that sets its turn-on threshold. Seen
+          for what it is, this is a flash ADC: ten threshold stages comparing
+          the same input in parallel, outputting a thermometer code &mdash;
+          except the code is displayed directly as a bar of LEDs instead of
+          being encoded into bits, and the thresholds are spaced for loudness
+          rather than linear voltage.
         </ScrollReveal>
 
         <ScrollReveal>
@@ -286,7 +289,21 @@ export default function SpeakerPage() {
           </a>
         </ScrollReveal>
 
-        <div className="media-row">
+        <ScrollReveal>
+          <div className="media-block media-block--full-width">
+            <img
+              src="/assets/img/speaker_vu_pcb_v2.png"
+              alt="Audio visualizer V2 PCB layout"
+              loading="lazy"
+            />
+            <div className="media-block__caption">
+              V2 layout: twenty near-identical stages, twenty different
+              divider values
+            </div>
+          </div>
+        </ScrollReveal>
+
+        <div className="media-row media-row--grid">
           <ScrollReveal>
             <div className="media-block">
               <img
@@ -296,19 +313,6 @@ export default function SpeakerPage() {
               />
               <div className="media-block__caption">
                 Visualizer V2: two rows of ten LEDs, green through red
-              </div>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal>
-            <div className="media-block">
-              <img
-                src="/assets/img/speaker_vu_pcb_v2.png"
-                alt="Audio visualizer V2 PCB layout"
-                loading="lazy"
-              />
-              <div className="media-block__caption">
-                V2 layout: twenty near-identical stages, twenty different
-                divider values
               </div>
             </div>
           </ScrollReveal>
@@ -331,44 +335,6 @@ export default function SpeakerPage() {
           (speaker_vu_demo.mp4 via AutoplayVideo) — this becomes the hero
           of this section once recorded.
         */}
-
-        {/* Interactive designer */}
-        <ScrollReveal tag="h2" id="ladder-designer">
-          Design It Yourself
-        </ScrollReveal>
-        <ScrollReveal tag="p">
-          To stop re-deriving resistor values every time a parameter moved, I
-          turned the math into an interactive tool. Pick the LED count,
-          dynamic range, and E-series, and it computes every divider, shows
-          the worst-case threshold error, simulates the ladder against a
-          volume slider, and prints a BOM. This is the actual tool I used to
-          size the board above &mdash; try it.
-        </ScrollReveal>
-        <ScrollReveal>
-          <div className="media-block media-block--full-width">
-            <iframe
-              src="/assets/vu-ladder-designer.html"
-              title="Interactive LED loudness ladder designer"
-              style={{
-                width: "100%",
-                height: "min(1600px, 85vh)",
-                border: "none",
-                display: "block",
-                background: "#fff",
-              }}
-            />
-            <div className="media-block__caption">
-              Live ladder designer &mdash;{" "}
-              <a
-                href="/assets/vu-ladder-designer.html"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                open full screen &rarr;
-              </a>
-            </div>
-          </div>
-        </ScrollReveal>
 
         {/* Specs */}
         <ScrollReveal>

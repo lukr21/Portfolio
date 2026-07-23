@@ -1196,6 +1196,13 @@ body {
   break-inside: avoid;
 }
 
+/* Grid variant: items read left-to-right, row by row */
+.media-row--grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
 /* Specs / details grid */
 .specs-grid {
   display: grid;
@@ -1570,6 +1577,10 @@ body {
 
   .media-row {
     columns: 1;
+  }
+
+  .media-row--grid {
+    grid-template-columns: 1fr;
   }
 
   .about-row {

@@ -36,7 +36,6 @@ const folders: FolderItem[] = [
       { label: "The Signal Chain", id: "signal-chain" },
       { label: "The Amp Board", id: "amp-board" },
       { label: "The Loudness Ladder", id: "loudness-ladder" },
-      { label: "Design It Yourself", id: "ladder-designer" },
       { label: "Next: The Housing", id: "whats-next" },
     ],
   },
