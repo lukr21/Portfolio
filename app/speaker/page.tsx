@@ -141,13 +141,13 @@ export default function SpeakerPage() {
             <div className="content-row__media">
               <div className="media-block">
                 <img
-                  src="/assets/img/speaker_render_top_v4.png"
-                  alt="Amp board V4 top view render"
+                  src="/assets/img/speaker_amp_schematic.png"
+                  alt="Amp board schematic, one sheet, all connections drawn as wires"
                   loading="lazy"
                 />
                 <div className="media-block__caption">
-                  V4 top view: USB-C in on the left, screw terminals out to the
-                  drivers on the right
+                  The full schematic on one sheet: USB-C and PD on the left,
+                  PCM2704 in the middle, TDA7297 stages on the right
                 </div>
               </div>
             </div>
