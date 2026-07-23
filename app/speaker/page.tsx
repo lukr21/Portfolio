@@ -89,7 +89,7 @@ export default function SpeakerPage() {
               <p>
                 The other goal was the skill itself: I had never designed a
                 PCB, and I picked this project specifically to learn. KiCad was
-                the obvious tool &mdash; it&apos;s free, and it does everything
+                the obvious tool, since it&apos;s free and does everything
                 from schematic capture to the fab files JLCPCB builds from.
               </p>
             </div>
@@ -160,6 +160,15 @@ export default function SpeakerPage() {
                 transients on VBUS. A crystal clocks the PCM2704, and volume
                 buttons on-board talk to it directly, since USB audio class
                 handles volume in-stream.
+              </p>
+              <p>
+                This schematic is also the first one I ever drew. I did not
+                yet know that net labels tie nets together, so every single
+                connection is a literal drawn wire. It works, and I keep it
+                here unretouched, because it marks where I started.{" "}
+                <a href="/assets/speaker_amp_schematic.pdf">
+                  Schematic PDF &rarr;
+                </a>
               </p>
             </div>
           </div>
@@ -234,14 +243,7 @@ export default function SpeakerPage() {
                 Layout follows the signal: the noise-sensitive USB data pairs
                 and crystal stay close to the PCM2704 on one side, while the
                 12V power path and the amp&apos;s output traces get the copper
-                they need on the other. The schematic is the very first one I
-                ever drew &mdash; before I learned that net labels tie nets
-                together, so every single connection is a literal drawn wire.
-                It works, and I keep it here unretouched as the starting
-                point the revision strip above climbs away from.{" "}
-                <a href="/assets/speaker_amp_schematic.pdf">
-                  Schematic PDF &rarr;
-                </a>
+                they need on the other.
               </p>
             </div>
           </div>
@@ -249,7 +251,7 @@ export default function SpeakerPage() {
 
         {/*
           PHOTO SLOT (amp board): when physical photos exist, add
-          media-blocks here — assembled board top-down (speaker_photo_amp.jpg),
+          media-blocks here: assembled board top-down (speaker_photo_amp.jpg),
           USB-C cable plugged in (speaker_photo_usbc.jpg).
         */}
 
@@ -265,10 +267,10 @@ export default function SpeakerPage() {
           an envelope detector and gain stage, and each LED hangs off its own
           MMBT3904 with a base divider that sets its turn-on threshold. Seen
           for what it is, this is a flash ADC: ten threshold stages comparing
-          the same input in parallel, outputting a thermometer code &mdash;
-          except the code is displayed directly as a bar of LEDs instead of
-          being encoded into bits, and the thresholds are spaced for loudness
-          rather than linear voltage.
+          the same input in parallel, outputting a thermometer code. The
+          twist is that the code is displayed directly as a bar of LEDs
+          instead of being encoded into bits, and the thresholds are spaced
+          for loudness rather than linear voltage.
         </ScrollReveal>
 
         <ScrollReveal>
@@ -280,10 +282,17 @@ export default function SpeakerPage() {
             />
             <div className="media-block__caption">
               One channel: envelope detector, &times;2.1 op-amp bus, then ten
-              common-emitter stages with individually sized base dividers.
-              Schematic number two &mdash; net labels this time, and it shows.
+              common-emitter stages with individually sized base dividers
             </div>
           </div>
+        </ScrollReveal>
+
+        <ScrollReveal tag="p">
+          This is schematic number two, drawn after the amp&apos;s. The
+          improvement is easy to see by scrolling up: net labels instead of
+          wires snaking across the whole sheet, and a signal path that reads
+          left to right in stages. Getting visibly better at exactly this was
+          the reason I picked the project.
         </ScrollReveal>
 
         <ScrollReveal tag="p">
@@ -322,8 +331,8 @@ export default function SpeakerPage() {
                 loading="lazy"
               />
               <div className="media-block__caption">
-                Visualizer V2: ten LEDs per channel &mdash; green through red
-                on the assembled board
+                Visualizer V2: ten LEDs per channel, green through red on the
+                assembled board
               </div>
             </div>
           </ScrollReveal>
@@ -343,7 +352,7 @@ export default function SpeakerPage() {
 
         {/*
           VIDEO SLOT: demo clip of the LEDs reacting to music goes here
-          (speaker_vu_demo.mp4 via AutoplayVideo) — this becomes the hero
+          (speaker_vu_demo.mp4 via AutoplayVideo), which becomes the hero
           of this section once recorded.
         */}
 
@@ -400,8 +409,8 @@ export default function SpeakerPage() {
               drivers are picked out and modeled. What&apos;s left is the part
               you actually see: a custom speaker enclosure that mounts the
               drivers, the amp, and the LED ladder as its front face. This
-              section will grow into a build log &mdash; assembly photos,
-              measurements, and a demo video &mdash; as the housing comes
+              section will grow into a build log with assembly photos,
+              measurements, and a demo video as the housing comes
               together.
             </p>
           </div>
