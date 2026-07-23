@@ -26,6 +26,46 @@ function flattenIds(sections: Section[]): string[] {
   return ids;
 }
 
+/* Fixed-duration scroll: every sidebar jump takes the same time
+   regardless of distance (native smooth scroll scales with distance) */
+const SCROLL_DURATION_MS = 350;
+
+function animateScrollTo(targetY: number) {
+  const startY = window.scrollY;
+  const dist = targetY - startY;
+  if (
+    dist === 0 ||
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  ) {
+    window.scrollTo({ top: targetY, behavior: "auto" });
+    return;
+  }
+  // Neutralize CSS scroll-behavior:smooth so per-frame jumps aren't re-animated
+  const root = document.documentElement;
+  const prevBehavior = root.style.scrollBehavior;
+  root.style.scrollBehavior = "auto";
+  const start = performance.now();
+  const ease = (t: number) =>
+    t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = (now: number) => {
+    const t = Math.min(1, (now - start) / SCROLL_DURATION_MS);
+    window.scrollTo(0, startY + dist * ease(t));
+    if (t < 1) {
+      requestAnimationFrame(step);
+    } else {
+      root.style.scrollBehavior = prevBehavior;
+    }
+  };
+  requestAnimationFrame(step);
+}
+
+function scrollToSection(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  animateScrollTo(el.getBoundingClientRect().top + window.scrollY);
+  history.pushState(null, "", `#${id}`);
+}
+
 const folders: FolderItem[] = [
   {
     label: "USB-C Speaker",
@@ -135,6 +175,7 @@ function FolderTree({
   toggleSubFolder,
   handleFolderClick,
   handleOverviewClick,
+  handleSectionClick,
   activeSection,
   onLinkClick,
   isMobile,
@@ -150,6 +191,7 @@ function FolderTree({
     active: boolean,
   ) => void;
   handleOverviewClick: (e: React.MouseEvent, folderPath: string) => void;
+  handleSectionClick: (e: React.MouseEvent, id: string) => void;
   activeSection: string;
   onLinkClick?: () => void;
   isMobile?: boolean;
@@ -300,7 +342,10 @@ function FolderTree({
                             <a
                               href={`#${section.id}`}
                               className={subFolderLinkClass}
-                              onClick={onLinkClick}
+                              onClick={(e) => {
+                                handleSectionClick(e, section.id);
+                                onLinkClick?.();
+                              }}
                             >
                               {section.label}
                             </a>
@@ -326,7 +371,10 @@ function FolderTree({
                                     <a
                                       href={`#${child.id}`}
                                       className={childClass}
-                                      onClick={onLinkClick}
+                                      onClick={(e) => {
+                                        handleSectionClick(e, child.id);
+                                        onLinkClick?.();
+                                      }}
                                     >
                                       {child.label}
                                     </a>
@@ -354,7 +402,10 @@ function FolderTree({
                         <a
                           href={`#${section.id}`}
                           className={linkClass}
-                          onClick={onLinkClick}
+                          onClick={(e) => {
+                            handleSectionClick(e, section.id);
+                            onLinkClick?.();
+                          }}
                         >
                           {section.label}
                         </a>
@@ -573,12 +624,20 @@ export default function Sidebar() {
     (e: React.MouseEvent, folderPath: string) => {
       if (pathname === folderPath) {
         e.preventDefault();
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        animateScrollTo(0);
         setActiveSection("");
       }
       // Otherwise let the Link navigate normally
     },
     [pathname],
+  );
+
+  const handleSectionClick = useCallback(
+    (e: React.MouseEvent, id: string) => {
+      e.preventDefault();
+      scrollToSection(id);
+    },
+    [],
   );
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);
@@ -611,6 +670,7 @@ export default function Sidebar() {
           toggleSubFolder={toggleSubFolder}
           handleFolderClick={handleFolderClick}
           handleOverviewClick={handleOverviewClick}
+          handleSectionClick={handleSectionClick}
           activeSection={activeSection}
         />
 
@@ -661,6 +721,7 @@ export default function Sidebar() {
             toggleSubFolder={toggleSubFolder}
             handleFolderClick={handleFolderClick}
             handleOverviewClick={handleOverviewClick}
+            handleSectionClick={handleSectionClick}
             activeSection={activeSection}
             onLinkClick={closeMobile}
             isMobile
