@@ -1912,7 +1912,8 @@ body {
    Driven purely by the app page being in the DOM. */
 .main { transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 body:has(.djs-page) .side-nav { transform: translateX(-100%); }
-body:has(.djs-page) .main { margin-left: 0; }
+body:has(.djs-page) .main { margin-left: 0; padding-top: 0; }
+body:has(.djs-page) { background: #0b0b0d; }
 body:has(.djs-page) .mobile-bar,
 body:has(.djs-page) .mobile-dropdown { transform: translateY(-110%); }
 .mobile-bar, .mobile-dropdown { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }

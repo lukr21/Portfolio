@@ -214,6 +214,18 @@ function SlotTag({ text, color, dot }: { text: string; color: string; dot?: stri
   );
 }
 
+function useIsMobile() {
+  const [m, setM] = useState(false);
+  useEffect(() => {
+    const q = window.matchMedia("(max-width: 800px)");
+    const on = () => setM(q.matches);
+    on();
+    q.addEventListener("change", on);
+    return () => q.removeEventListener("change", on);
+  }, []);
+  return m;
+}
+
 export default function DJNextApp() {
   const [playlistUrl, setPlaylistUrl] = useState("");
   const [status, setStatus] = useState<Status>("idle");
@@ -224,6 +236,8 @@ export default function DJNextApp() {
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [dj, setDj] = useState<DJState>(DJ0);
   const [visible, setVisible] = useState(MAX_SUGGESTIONS);
+  const isMobile = useIsMobile();
+  const [libOpen, setLibOpen] = useState(false);
   const [sort, setSort] = useState<{ by: "key" | "bpm" | null; dir: 1 | -1 }>({ by: "bpm", dir: -1 });
   const libScrollRef = useRef<HTMLDivElement | null>(null);
   const cancelRef = useRef(false);
@@ -444,7 +458,7 @@ export default function DJNextApp() {
   // smooth scrolling gets cancelled by concurrent style mutations); same 380ms
   // ease as the rest of the motion so it travels with the spotlight.
   useEffect(() => {
-    if (nowIdx < 0) return;
+    if (nowIdx < 0 || isMobile) return;
     const el = libScrollRef.current;
     if (!el) return;
     const from = el.scrollTop;
@@ -461,7 +475,7 @@ export default function DJNextApp() {
     };
     raf = requestAnimationFrame(step);
     return () => cancelAnimationFrame(raf);
-  }, [nowIdx]);
+  }, [nowIdx, isMobile]);
 
   const cycleSort = (by: "key" | "bpm") =>
     setSort((s) => (s.by !== by ? { by, dir: 1 } : s.dir === 1 ? { by, dir: -1 } : { by: null, dir: 1 }));
@@ -470,6 +484,33 @@ export default function DJNextApp() {
   // ---- rail (port of strip()) ----
   const rail = (() => {
     if (!dj.nowId && !dj.slideBack) return null;
+    if (isMobile) {
+      const nowT = byId(dj.nowId);
+      const prevT = dj.history.length ? byId(dj.history[dj.history.length - 1]) : null;
+      const half: CSSProperties = { ...S.slot, width: "auto", flex: 1, minWidth: 0 };
+      return (
+        <div style={{ display: "flex", border: "1px solid #232326", background: "#0f0f11", overflow: "hidden" }}>
+          {prevT ? (
+            <div style={half}>
+              <div style={{ opacity: 0.6, minWidth: 0 }}>
+                <SlotTag text="PREVIOUS" color="#8b8b93" />
+                <SlotLines t={prevT} />
+              </div>
+            </div>
+          ) : (
+            <div style={{ ...half, display: "flex", alignItems: "center", justifyContent: "center", color: "#2c2c31", font: `400 12px ${MONO}` }}>—</div>
+          )}
+          {nowT && (
+            <div style={{ ...half, borderRight: "none", background: "rgba(59,130,246,.07)", boxShadow: "inset 0 0 0 1px #3b82f6" }}>
+              <div style={{ minWidth: 0 }}>
+                <SlotTag text="NOW PLAYING · LIVE" color="#7db2f9" dot="#22c55e" />
+                <SlotLines t={nowT} />
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
     const sliding = !!dj.slide;
     const railNow = byId(sliding ? dj.slide!.nowId : dj.nowId);
     const histIds = (sliding ? dj.slide!.history : dj.history).slice(-3);
@@ -589,7 +630,7 @@ export default function DJNextApp() {
   return (
     <div style={{ color: "#f4f4f5", maxWidth: 1200, margin: "0 auto" }}>
       {/* Header row */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "18px 22px 0", flexWrap: "wrap" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: isMobile ? 10 : 14, padding: isMobile ? "14px 14px 0" : "18px 22px 0", flexWrap: "wrap" }}>
         <Link href="/djnext" className="djs-back" aria-label="Back to lucaskrippendorff.com">
           <span aria-hidden="true">&larr;</span>
           <span>Back</span>
@@ -649,7 +690,7 @@ export default function DJNextApp() {
       {(showPanes || idle) && (
         <>
           {/* Set-timeline rail */}
-          <div style={{ ...S.panel, margin: "16px 22px 0", padding: "14px 16px", overflow: "hidden" }}>
+          <div style={{ ...S.panel, margin: isMobile ? "14px 14px 0" : "16px 22px 0", padding: isMobile ? "12px 12px" : "14px 16px", overflow: "hidden" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
               <div style={S.label}>SET TIMELINE</div>
               <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -667,18 +708,30 @@ export default function DJNextApp() {
             {rail || (
               <div style={{ border: "1px dashed #2c2c31", padding: "28px 18px", textAlign: "center", color: "#55555c", font: `400 10.5px ${MONO}` }}>
                 {idle
-                  ? "your set builds here: the last three tracks you played, what is live now, and what could come next"
+                  ? isMobile
+                    ? "your set builds here: the track before, and what is live now"
+                    : "your set builds here: the last three tracks you played, what is live now, and what could come next"
                   : "pick a track from the library to start your set"}
               </div>
             )}
           </div>
 
           {/* Panes */}
-          <div style={{ display: "flex", gap: 16, padding: "16px 22px 22px", alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: isMobile ? 12 : 16, padding: isMobile ? "14px 14px 18px" : "16px 22px 22px", alignItems: "flex-start", flexWrap: "wrap" }}>
             {/* Library */}
-            <div style={{ ...S.panel, width: 330, flex: "none", overflow: "hidden" }}>
+            <div style={{ ...S.panel, width: isMobile ? "100%" : 330, flex: "none", overflow: "hidden" }}>
               <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid #232326" }}>
-                <div style={{ ...S.label, marginBottom: 8 }}>LIBRARY</div>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                  <div style={S.label}>LIBRARY</div>
+                  {isMobile && (
+                    <button
+                      onClick={() => setLibOpen((o) => !o)}
+                      style={{ background: "#1a1a1e", border: "1px solid #2c2c31", borderRadius: 0, color: "#8b8b93", font: `500 10px ${MONO}`, padding: "3px 9px", cursor: "pointer" }}
+                    >
+                      {libOpen ? "collapse ▲" : `expand${filt.length ? ` (${filt.length})` : ""} ▼`}
+                    </button>
+                  )}
+                </div>
                 <input
                   value={dj.q}
                   onChange={(e) => setDj((s) => ({ ...s, q: e.target.value }))}
@@ -703,8 +756,24 @@ export default function DJNextApp() {
                   ))}
                 </div>
               </div>
-              <div ref={libScrollRef} style={{ maxHeight: 436, overflowY: "auto" }}>
-                {idle && (
+              <div ref={libScrollRef} style={{ maxHeight: isMobile ? 340 : 436, overflowY: "auto", display: isMobile && !libOpen ? "none" : undefined }}>
+                {isMobile &&
+                  filt.map((t) => (
+                    <div
+                      key={t.id}
+                      onClick={() => pick(t.id)}
+                      style={{ padding: "9px 14px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: t.id === dj.nowId ? "rgba(59,130,246,.12)" : "transparent", boxShadow: t.id === dj.nowId ? "inset 2px 0 0 #3b82f6" : "none", opacity: dj.played[t.id] && t.id !== dj.nowId ? 0.45 : 1 }}
+                    >
+                      <div style={{ font: `500 13px ${INTER}`, color: "#d4d4d8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {t.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{t.artist}</span>
+                      </div>
+                      <div style={{ marginTop: 3, font: `500 11px ${MONO}` }}>
+                        <span style={{ color: keyText(t.camelot) }}>{t.camelot || "?"}</span>{" "}
+                        <BpmText bpm={t.bpm} color="#f4f4f5" />
+                      </div>
+                    </div>
+                  ))}
+                {!isMobile && idle && (
                   <div>
                     {skeletonRows(8, "libskel")}
                     <div style={{ padding: "14px", textAlign: "center", color: "#55555c", font: `400 10.5px ${MONO}` }}>
@@ -712,6 +781,7 @@ export default function DJNextApp() {
                     </div>
                   </div>
                 )}
+                {!isMobile && (
                 <div style={{ position: "relative" }}>
                   {/* spotlight bar */}
                   <div
@@ -759,6 +829,7 @@ export default function DJNextApp() {
                     ))}
                   </div>
                 </div>
+                )}
               </div>
             </div>
 
@@ -783,16 +854,43 @@ export default function DJNextApp() {
                       </div>
                     ))}
                     <div style={{ flex: 1 }} />
-                    <div style={{ font: `400 11px ${MONO}`, color: "#55555c" }}>
-                      <span style={S.kbd}>j</span> <span style={S.kbd}>k</span> navigate · <span style={S.kbd}>⏎</span> play
+                    {!isMobile && (
+                      <div style={{ font: `400 11px ${MONO}`, color: "#55555c" }}>
+                        <span style={S.kbd}>j</span> <span style={S.kbd}>k</span> navigate · <span style={S.kbd}>⏎</span> play
+                      </div>
+                    )}
+                  </div>
+                  {!isMobile && (
+                    <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, padding: "0 12px 8px", font: `600 10px ${INTER}`, letterSpacing: 1.2, color: "#8b8b93" }}>
+                      <div>#</div><div>TRACK</div><div>KEY</div><div>BPM</div><div>NOTE</div><div style={{ textAlign: "right" }}>SCORE</div>
                     </div>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, padding: "0 12px 8px", font: `600 10px ${INTER}`, letterSpacing: 1.2, color: "#8b8b93" }}>
-                    <div>#</div><div>TRACK</div><div>KEY</div><div>BPM</div><div>NOTE</div><div style={{ textAlign: "right" }}>SCORE</div>
-                  </div>
+                  )}
                   {ranked.map((s, i) => {
                     const boost = isBoost(s.keyLabel);
                     const note = `${s.played ? "played · " : ""}${noteLabel(s.keyLabel)} · ${s.bpmMult !== 1 ? "half/double" : s.bpmPct !== null ? `${s.bpmPct >= 0 ? "+" : ""}${s.bpmPct}%` : "unknown bpm"}`;
+                    if (isMobile) {
+                      return (
+                        <div
+                          key={s.id}
+                          onClick={() => pick(s.id)}
+                          style={{ padding: "10px 12px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: boost ? "rgba(249,115,22,.05)" : "transparent", opacity: s.played ? 0.55 : 1, animation: changed[i] ? `${dj.epoch % 2 ? "djIn2" : "djIn"} .38s ${EASE} both` : "none" }}
+                        >
+                          <div style={{ font: `500 13px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                            <span style={{ font: `500 11px ${MONO}`, color: "#55555c" }}>{i + 1}</span>{" "}
+                            {s.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{s.artist}</span>
+                          </div>
+                          <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ ...S.keyPill, background: keyBg(s.camelot), color: keyText(s.camelot) }}>{s.camelot || "?"}</span>
+                            <span style={S.bpmPill}><BpmText bpm={s.bpm} color="#f4f4f5" /></span>
+                            <span style={{ flex: 1 }} />
+                            <span style={{ font: `500 10.5px ${MONO}`, color: "#8b8b93" }}>{s.score.toFixed(2)}</span>
+                            <span style={{ width: 56, height: 6, background: "#1c1c20", overflow: "hidden", display: "inline-block" }}>
+                              <span style={{ display: "block", width: `${Math.round(Math.min(1, s.score) * 100)}%`, height: 6, background: boost ? "linear-gradient(90deg,#f97316,#f9a03f)" : "linear-gradient(90deg,#3b82f6,#22c55e)" }} />
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
                     return (
                       <div
                         key={s.id}
@@ -836,10 +934,24 @@ export default function DJNextApp() {
                 </>
               ) : (
                 <div>
-                  <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, padding: "0 12px 8px", font: `600 10px ${INTER}`, letterSpacing: 1.2, color: "#8b8b93" }}>
-                    <div>#</div><div>TRACK</div><div>KEY</div><div>BPM</div><div>NOTE</div><div style={{ textAlign: "right" }}>SCORE</div>
-                  </div>
-                  {Array.from({ length: 5 }, (_, i) => (
+                  {!isMobile && (
+                    <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, padding: "0 12px 8px", font: `600 10px ${INTER}`, letterSpacing: 1.2, color: "#8b8b93" }}>
+                      <div>#</div><div>TRACK</div><div>KEY</div><div>BPM</div><div>NOTE</div><div style={{ textAlign: "right" }}>SCORE</div>
+                    </div>
+                  )}
+                  {isMobile &&
+                    Array.from({ length: 4 }, (_, i) => (
+                      <div key={`msk${i}`} style={{ padding: "12px 12px", borderTop: "1px solid #1c1c20" }}>
+                        <span style={{ display: "block", height: 8, width: `${55 + ((i * 19) % 35)}%`, background: "#1c1c20" }} />
+                        <span style={{ marginTop: 8, display: "flex", gap: 8 }}>
+                          <span style={{ height: 14, width: 34, background: "#16161b" }} />
+                          <span style={{ height: 14, width: 34, background: "#16161b" }} />
+                          <span style={{ flex: 1 }} />
+                          <span style={{ height: 6, width: 56, background: "#1c1c20", alignSelf: "center" }} />
+                        </span>
+                      </div>
+                    ))}
+                  {!isMobile && Array.from({ length: 5 }, (_, i) => (
                     <div key={`sugskel${i}`} style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, alignItems: "center", padding: "12px 12px", borderTop: "1px solid #1c1c20" }}>
                       <span style={{ font: `500 12px 'JetBrains Mono',monospace`, color: "#2c2c31" }}>{i + 1}</span>
                       <span style={{ height: 8, width: `${52 + ((i * 23) % 40)}%`, background: "#1c1c20" }} />
