@@ -485,29 +485,54 @@ export default function DJNextApp() {
   const rail = (() => {
     if (!dj.nowId && !dj.slideBack) return null;
     if (isMobile) {
+      const sliding = !!dj.slide;
       const nowT = byId(dj.nowId);
+      const prevSlotEl = (t: Track | null, style: CSSProperties, dim: number) =>
+        t ? (
+          <div style={style}>
+            <div style={{ opacity: dim, minWidth: 0 }}>
+              <SlotTag text="PREVIOUS" color="#8b8b93" />
+              <SlotLines t={t} />
+            </div>
+          </div>
+        ) : (
+          <div style={{ ...style, display: "flex", alignItems: "center", justifyContent: "center", color: "#2c2c31", font: `400 12px ${MONO}` }}>—</div>
+        );
+      const nowSlotEl = (t: Track, style: CSSProperties) => (
+        <div style={{ ...style, borderRight: "none", background: "rgba(59,130,246,.07)", boxShadow: "inset 0 0 0 1px #3b82f6" }}>
+          <div style={{ minWidth: 0 }}>
+            <SlotTag text="NOW PLAYING · LIVE" color="#7db2f9" dot="#22c55e" />
+            <SlotLines t={t} />
+          </div>
+        </div>
+      );
+      if (sliding && nowT) {
+        // conveyor: [old previous][old now -> becomes previous][new now] slides one slot left
+        const third: CSSProperties = { ...S.slot, width: "auto", flex: "0 0 33.3333%", minWidth: 0 };
+        const oldPrev = dj.slide!.history.length ? byId(dj.slide!.history[dj.slide!.history.length - 1]) : null;
+        const oldNow = byId(dj.slide!.nowId);
+        return (
+          <div style={{ border: "1px solid #232326", background: "#0f0f11", overflow: "hidden" }}>
+            <div
+              key={`mslide-${dj.slide!.id}`}
+              style={{ display: "flex", width: "150%", animation: `djRailM .38s ${EASE} forwards` }}
+              onAnimationEnd={(ev) => { if (ev.animationName === "djRailM") commit(); }}
+            >
+              {prevSlotEl(oldPrev, third, 0.38)}
+              {oldNow ? prevSlotEl(oldNow, third, 0.6) : prevSlotEl(null, third, 0.6)}
+              {nowSlotEl(nowT, third)}
+            </div>
+          </div>
+        );
+      }
+      const half: CSSProperties = { ...S.slot, width: "auto", flex: "0 0 50%", minWidth: 0 };
       const prevT = dj.history.length ? byId(dj.history[dj.history.length - 1]) : null;
-      const half: CSSProperties = { ...S.slot, width: "auto", flex: 1, minWidth: 0 };
       return (
-        <div key={`mrail-${dj.nowId}`} style={{ display: "flex", border: "1px solid #232326", background: "#0f0f11", overflow: "hidden", animation: `djIn .38s ${EASE} both` }}>
-          {prevT ? (
-            <div style={half}>
-              <div style={{ opacity: 0.6, minWidth: 0 }}>
-                <SlotTag text="PREVIOUS" color="#8b8b93" />
-                <SlotLines t={prevT} />
-              </div>
-            </div>
-          ) : (
-            <div style={{ ...half, display: "flex", alignItems: "center", justifyContent: "center", color: "#2c2c31", font: `400 12px ${MONO}` }}>—</div>
-          )}
-          {nowT && (
-            <div style={{ ...half, borderRight: "none", background: "rgba(59,130,246,.07)", boxShadow: "inset 0 0 0 1px #3b82f6" }}>
-              <div style={{ minWidth: 0 }}>
-                <SlotTag text="NOW PLAYING · LIVE" color="#7db2f9" dot="#22c55e" />
-                <SlotLines t={nowT} />
-              </div>
-            </div>
-          )}
+        <div style={{ border: "1px solid #232326", background: "#0f0f11", overflow: "hidden" }}>
+          <div style={{ display: "flex" }}>
+            {prevSlotEl(prevT, half, 0.6)}
+            {nowT && nowSlotEl(nowT, half)}
+          </div>
         </div>
       );
     }
@@ -873,7 +898,7 @@ export default function DJNextApp() {
                         <div
                           key={s.id}
                           onClick={() => pick(s.id)}
-                          style={{ padding: "10px 12px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: boost ? "rgba(249,115,22,.05)" : "transparent", opacity: s.played ? 0.55 : 1, animation: changed[i] ? `${dj.epoch % 2 ? "djIn2" : "djIn"} .38s ${EASE} both` : "none" }}
+                          style={{ padding: "10px 12px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: boost ? "rgba(249,115,22,.05)" : "transparent", opacity: s.played ? 0.55 : 1, animation: changed[i] ? `${dj.epoch % 2 ? "djFade2" : "djFade"} .38s ${EASE} both` : "none" }}
                         >
                           <div style={{ font: `500 13px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             <span style={{ font: `500 11px ${MONO}`, color: "#55555c" }}>{i + 1}</span>{" "}
