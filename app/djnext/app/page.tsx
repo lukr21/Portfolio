@@ -24,8 +24,10 @@ export default function DJNextToolPage() {
         <p>
           Track data: <a href="https://getsongbpm.com" target="_blank" rel="noopener noreferrer">GetSongBPM</a>,
           with Deezer and iTunes 30&ndash;90&nbsp;s previews analyzed locally in your browser (essentia.js)
-          when the databases come up short. Your playlist, results, and played-state stay in your
-          browser; nothing is stored server-side.
+          when the databases come up short. Anonymous track data (the BPM and key of a song,
+          keyed by its industry recording code) is cached server-side so each track is only ever
+          analyzed once. Your playlist, results, and played-state stay in your browser; nothing
+          about you is stored.
         </p>
       </div>
     </div>

@@ -2,6 +2,46 @@ import { NextRequest, NextResponse } from "next/server";
 
 const GSB = "https://api.getsong.co";
 
+/*
+ * Shared track cache: ISRC -> {bpm, key}. Any track analyzed or looked up once
+ * is served from here for every later visitor, so GetSongBPM load scales with
+ * NEW tracks, not with traffic. Backed by Upstash Redis via REST (the store
+ * Vercel's marketplace provisions); if the env vars are absent the cache
+ * no-ops and the route behaves as before. Track data is anonymous catalog
+ * data - nothing about the requesting user is stored.
+ */
+const CACHE_VER = "djnext:v1:";
+const kvUrl = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL || "";
+const kvToken = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN || "";
+
+interface CachedTrack { bpm: number | null; key: string | null; }
+
+async function cacheGet(isrc: string): Promise<CachedTrack | null> {
+  if (!kvUrl || !kvToken || !isrc) return null;
+  try {
+    const r = await fetch(`${kvUrl}/get/${CACHE_VER}${encodeURIComponent(isrc)}`, {
+      headers: { Authorization: `Bearer ${kvToken}` },
+    });
+    if (!r.ok) return null;
+    const d = await r.json();
+    return d.result ? (JSON.parse(d.result) as CachedTrack) : null;
+  } catch {
+    return null;
+  }
+}
+
+async function cacheSet(isrc: string, value: CachedTrack): Promise<void> {
+  if (!kvUrl || !kvToken || !isrc) return;
+  try {
+    await fetch(`${kvUrl}/set/${CACHE_VER}${encodeURIComponent(isrc)}/${encodeURIComponent(JSON.stringify(value))}`, {
+      headers: { Authorization: `Bearer ${kvToken}` },
+    });
+  } catch { /* cache write is best-effort */ }
+}
+
+const VALID_CAMELOT = /^(1[0-2]|[1-9])[AB]$/;
+const validBpm = (b: unknown): b is number => typeof b === "number" && isFinite(b) && b >= 40 && b <= 250;
+
 function clean(s: string): string {
   return s
     .replace(/\s*[([].*?(remix|edit|mix|version|feat\.?|ft\.?|remaster).*?[)\]]/gi, "")
@@ -84,10 +124,27 @@ async function itunesPreview(title: string, artist: string): Promise<string | nu
 
 export async function GET(req: NextRequest) {
   const p = req.nextUrl.searchParams;
+  if (p.get("diag") === "1") {
+    // deployment check: is the shared track cache configured and reachable?
+    if (!kvUrl || !kvToken) return NextResponse.json({ cache: "not configured" });
+    const probe = await cacheGet("DIAGPROBE0000");
+    void probe;
+    try {
+      const r = await fetch(`${kvUrl}/ping`, { headers: { Authorization: `Bearer ${kvToken}` } });
+      return NextResponse.json({ cache: r.ok ? "configured and reachable" : `configured but store returned ${r.status}` });
+    } catch {
+      return NextResponse.json({ cache: "configured but unreachable" });
+    }
+  }
   const title = p.get("title") || "";
   const artist = p.get("artist") || "";
   const isrc = p.get("isrc") || "";
   if (!title || !artist) return NextResponse.json({ error: "title and artist required" }, { status: 400 });
+
+  const cached = await cacheGet(isrc);
+  if (cached && (cached.bpm || cached.key)) {
+    return NextResponse.json({ bpm: cached.bpm, key: cached.key, preview: null, previewKind: null, source: "cache" });
+  }
 
   const gsb = await gsbLookup(title, artist);
   let bpm = gsb?.bpm ?? null;
@@ -109,5 +166,30 @@ export async function GET(req: NextRequest) {
       }
     }
   }
+  if (bpm && key) await cacheSet(isrc, { bpm, key });
   return NextResponse.json({ bpm, key, preview, previewKind, source: gsb ? "getsongbpm" : bpm || preview ? "deezer/itunes" : "miss" });
+}
+
+/*
+ * Browsers report their local analysis results here so one visitor's
+ * WASM analysis benefits everyone. Write-once per ISRC (existing entries are
+ * never overwritten) and values are strictly validated, which bounds what a
+ * hostile client could do to "wrong number for a track nobody had cached yet".
+ */
+export async function POST(req: NextRequest) {
+  if (!kvUrl || !kvToken) return NextResponse.json({ ok: false });
+  let body: { isrc?: unknown; bpm?: unknown; key?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "bad json" }, { status: 400 });
+  }
+  const isrc = typeof body.isrc === "string" && /^[A-Z0-9]{12}$/i.test(body.isrc) ? body.isrc : null;
+  const bpm = validBpm(body.bpm) ? Math.round((body.bpm as number) * 10) / 10 : null;
+  const key = typeof body.key === "string" && VALID_CAMELOT.test(body.key) ? body.key : null;
+  if (!isrc || (!bpm && !key)) return NextResponse.json({ error: "invalid" }, { status: 400 });
+  const existing = await cacheGet(isrc);
+  if (existing) return NextResponse.json({ ok: true, kept: "existing" });
+  await cacheSet(isrc, { bpm, key });
+  return NextResponse.json({ ok: true });
 }

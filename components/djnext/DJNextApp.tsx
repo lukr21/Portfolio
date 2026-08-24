@@ -296,7 +296,17 @@ export default function DJNextApp() {
                 const a = await analyzeClip(ld.preview, !bpm, !camelot);
                 bpm = bpm || a.bpm;
                 camelot = camelot || a.camelot;
-                if (a.bpm || a.camelot) source += "+local";
+                if (a.bpm || a.camelot) {
+                  source += "+local";
+                  // share this analysis so no other visitor re-does it
+                  if (t.isrc) {
+                    fetch("/api/djnext/lookup", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ isrc: t.isrc, bpm, key: camelot }),
+                    }).catch(() => {});
+                  }
+                }
               }
             }
           } catch { /* leave unknown */ }
