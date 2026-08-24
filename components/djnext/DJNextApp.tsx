@@ -357,7 +357,7 @@ export default function DJNextApp() {
         slide: s.nowId ? { id, nowId: s.nowId, history: s.history } : null,
         lastSnap: { nowId: s.nowId, history: s.history, played: s.played },
         nowId: id,
-        history: s.nowId ? [...s.history, s.nowId].slice(-8) : s.history,
+        history: s.nowId ? [...s.history, s.nowId] : s.history,
         played,
         sel: 0,
         hoverId: null,
