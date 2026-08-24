@@ -203,7 +203,7 @@ function FolderTree({
     active: boolean,
   ) => void;
   handleOverviewClick: (e: React.MouseEvent, folderPath: string) => void;
-  handleSectionClick: (e: React.MouseEvent, id: string) => void;
+  handleSectionClick: (e: React.MouseEvent, id: string, folderPath?: string) => void;
   activeSection: string;
   onLinkClick?: () => void;
   isMobile?: boolean;
@@ -355,7 +355,7 @@ function FolderTree({
                               href={`#${section.id}`}
                               className={subFolderLinkClass}
                               onClick={(e) => {
-                                handleSectionClick(e, section.id);
+                                handleSectionClick(e, section.id, folder.path);
                                 onLinkClick?.();
                               }}
                             >
@@ -384,7 +384,7 @@ function FolderTree({
                                       href={`#${child.id}`}
                                       className={childClass}
                                       onClick={(e) => {
-                                        handleSectionClick(e, child.id);
+                                        handleSectionClick(e, child.id, folder.path);
                                         onLinkClick?.();
                                       }}
                                     >
@@ -415,7 +415,7 @@ function FolderTree({
                           href={`#${section.id}`}
                           className={linkClass}
                           onClick={(e) => {
-                            handleSectionClick(e, section.id);
+                            handleSectionClick(e, section.id, folder.path);
                             onLinkClick?.();
                           }}
                         >
@@ -648,11 +648,15 @@ export default function Sidebar() {
   );
 
   const handleSectionClick = useCallback(
-    (e: React.MouseEvent, id: string) => {
+    (e: React.MouseEvent, id: string, folderPath?: string) => {
       e.preventDefault();
+      if (folderPath && pathname !== folderPath) {
+        router.push(`${folderPath}#${id}`);
+        return;
+      }
       scrollToSection(id);
     },
-    [],
+    [pathname, router],
   );
 
   const closeMobile = useCallback(() => setMobileOpen(false), []);

@@ -1,6 +1,15 @@
 import Link from "next/link";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 import ScrollReveal from "@/components/ScrollReveal";
+import OpenDJNext from "@/components/djnext/OpenDJNext";
 import { pageMetadata } from "@/components/meta";
+
+const tex = (s: string) => ({ __html: katex.renderToString(s, { displayMode: true, throwOnError: false }) });
+
+const EQ_MAIN = String.raw`\text{score} = w \cdot K + (1 - w) \cdot T`;
+const EQ_K = String.raw`K = \begin{cases} 1.0 & \text{same key} \\ 0.9 & \pm 1 \text{ hour} \\ 0.85 & \text{relative} \\ 0.65 & \text{energy diagonal} \\ 0.55 & \pm 2 \text{ hours} \\ 0.4 & \text{parallel} \\ 0 & \text{clash} \end{cases}`;
+const EQ_T = String.raw`T(\Delta) = \begin{cases} 1.0 \rightarrow 0.85 & |\Delta| \le 3\% \\ 0.85 \rightarrow 0.40 & 3\% < |\Delta| \le 6\% \\ 0.40 \rightarrow 0 & 6\% < |\Delta| \le 8\% \\ \text{hidden} & |\Delta| > 8\% \end{cases}`;
 
 export const metadata = pageMetadata(
   "DJNext",
@@ -25,22 +34,7 @@ export default function DJNextPage() {
           the rest of the playlist by how well it mixes.
         </p>
         <p>
-          <Link
-            href="/djnext/app"
-            style={{
-              display: "inline-block",
-              margin: "1.75rem 0 0.75rem",
-              padding: "0.75rem 1.6rem",
-              background: "var(--blue)",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: "0.95rem",
-              borderRadius: "var(--radius-sm)",
-              textDecoration: "none",
-            }}
-          >
-            Open DJNext &rarr;
-          </Link>
+          <OpenDJNext className="djnext-open-btn">Open DJNext &rarr;</OpenDJNext>
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
@@ -84,28 +78,16 @@ export default function DJNextPage() {
 
         <ScrollReveal>
           <div className="equation">
-            <div className="equation__main">
-              score = <em>w</em> &middot; K + (1 &minus; <em>w</em>) &middot; T
+            <div className="equation__main" dangerouslySetInnerHTML={tex(EQ_MAIN)} />
+            <div className="equation__cases">
+              <div dangerouslySetInnerHTML={tex(EQ_K)} />
+              <div dangerouslySetInnerHTML={tex(EQ_T)} />
             </div>
-            <div className="equation__defs">
-              <div>
-                <span className="equation__var">K</span> key: same 1.0 &middot;
-                &plusmn;1 hour 0.9 &middot; relative 0.85 &middot; energy
-                diagonal 0.65 &middot; &plusmn;2 hours 0.55 &middot; parallel
-                0.4 &middot; clash 0
-              </div>
-              <div>
-                <span className="equation__var">T</span> tempo, from
-                |&Delta;BPM| in percent (best of &times;&frac12;, &times;1,
-                &times;2): &le;3% &rarr; 1.0&ndash;0.85 &middot; 3&ndash;6%
-                &rarr; 0.85&ndash;0.4 &middot; 6&ndash;8% &rarr;
-                0.4&ndash;0 &middot; &gt;8% hidden
-              </div>
-              <div>
-                <span className="equation__var">w</span> key weight, 0.6 by
-                default &middot; played tracks: score &times; 0.5
-              </div>
-            </div>
+            <p className="equation__note">
+              &Delta; is the BPM difference in percent, taking the best of
+              &times;&frac12;, &times;1, and &times;2 time. <em>w</em> is the
+              key weight, 0.6 by default. Played tracks score &times;0.5.
+            </p>
           </div>
         </ScrollReveal>
 

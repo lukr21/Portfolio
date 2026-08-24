@@ -14,6 +14,8 @@ export default function DJNextToolPage() {
       <DJNextApp />
       <div className="djs-footnotes">
         <p>
+          DJNext is built and maintained by{" "}
+          <Link href="/">Lucas Krippendorff</Link> &middot;{" "}
           <Link href="/djnext">About DJNext</Link> &middot; Works with playlists set to Public or
           Unlisted in TIDAL (Private ones are visible only to their owner, even with the link).
           Pasting an unlisted link here discloses it to this site&rsquo;s lookup service, which

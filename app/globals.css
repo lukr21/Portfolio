@@ -1881,3 +1881,95 @@ body {
   font-weight: 600;
   color: var(--text);
 }
+
+
+/* Hero button on the DJNext write-up page */
+.djnext-open-btn {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 5px;
+  margin: 1.75rem 0 0.75rem;
+  padding: 0.8rem 1.7rem 0.7rem;
+  background: #111113;
+  border: 1px solid #2c2c31;
+  border-radius: 0;
+  color: #f4f4f5;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: border-color var(--transition), background var(--transition);
+}
+.djnext-open-btn:hover { background: #16161b; border-color: #3b82f6; }
+.djnext-open-btn::after {
+  content: "";
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, #38bdf8 0 8.3%, #4f6ef7 0 16.6%, #8b5cf6 0 25%, #c53ae0 0 33.3%, #ec4899 0 41.6%, #ef4655 0 50%, #f4672a 0 58.3%, #f59e0b 0 66.6%, #e0d515 0 75%, #84cc16 0 83.3%, #22c55e 0 91.6%, #2dd4bf 0 100%);
+}
+
+/* Entering DJNext: the site chrome slides away and the tool takes the room.
+   Driven purely by the app page being in the DOM. */
+.main { transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+body:has(.djs-page) .side-nav { transform: translateX(-100%); }
+body:has(.djs-page) .main { margin-left: 0; }
+body:has(.djs-page) .mobile-bar,
+body:has(.djs-page) .mobile-dropdown { transform: translateY(-110%); }
+.mobile-bar, .mobile-dropdown { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+.djs-page { animation: djsFadeIn 0.45s ease both; }
+@keyframes djsFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* Back to the site from inside the tool: compact chip in the site's own style */
+.djs-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.8rem 0.4rem 0.6rem;
+  background: #ffffff;
+  border-radius: 0;
+  color: #1a1a2e;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  flex: none;
+}
+.djs-back:hover { transform: translateX(-2px); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5); }
+.djs-back img { width: 16px; height: 16px; display: block; }
+.djs-back span { white-space: nowrap; }
+
+/* KaTeX equation layout */
+.equation__main .katex-display { margin: 0.2rem 0 1rem; }
+.equation__cases {
+  display: flex;
+  gap: 2.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  overflow-x: auto;
+}
+.equation__cases .katex-display { margin: 0.4rem 0; }
+.equation__cases .katex { font-size: 0.92rem; }
+.equation__note {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+.equation__note em { color: var(--blue); font-style: italic; }
+
+/* LK mark in the DJNext header: persistent link back to the site */
+.djs-lk {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  background: #ffffff;
+  border-radius: 0;
+  flex: none;
+  transition: transform 0.2s ease;
+}
+.djs-lk:hover { transform: scale(1.08); }
+.djs-lk img { width: 16px; height: 16px; display: block; }

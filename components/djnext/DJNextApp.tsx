@@ -7,6 +7,7 @@
  * does not follow the site theme. Radius 0 everywhere is intentional.
  */
 
+import Link from "next/link";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Cfg, Track, rank, toCamelot } from "./camelot";
 import DJLogo from "./DJLogo";
@@ -562,11 +563,27 @@ export default function DJNextApp() {
   const resetPlayed = () => setDj((s) => ({ ...s, played: {}, lastSnap: null, epoch: s.epoch + 1 }));
 
   const showPanes = status === "ready" || status === "analyzing";
+  const idle = !showPanes;
+
+  const skeletonRows = (n: number, keyed: string) => (
+    <>
+      {Array.from({ length: n }, (_, i) => (
+        <div key={`${keyed}${i}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, height: ROW_H, boxSizing: "border-box", padding: "0 14px" }}>
+          <span style={{ height: 8, width: `${46 + ((i * 17) % 34)}%`, background: "#1c1c20" }} />
+          <span style={{ height: 8, width: 42, background: "#16161b", flex: "none" }} />
+        </div>
+      ))}
+    </>
+  );
 
   return (
     <div style={{ color: "#f4f4f5", maxWidth: 1200, margin: "0 auto" }}>
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "center", gap: 14, padding: "18px 22px 0", flexWrap: "wrap" }}>
+        <Link href="/djnext" className="djs-back" aria-label="Back to lucaskrippendorff.com">
+          <span aria-hidden="true">&larr;</span>
+          <span>Back</span>
+        </Link>
         <DJLogo size={20} />
         <div style={{ flex: 1, display: "flex", alignItems: "center", gap: 10, minWidth: 320 }}>
           <input
@@ -584,7 +601,7 @@ export default function DJNextApp() {
             {status === "loading" ? "Loading…" : "Load"}
           </button>
         </div>
-        <div style={{ font: `400 11.5px ${INTER}`, color: "#8b8b93" }}>
+        <div style={{ font: `400 11.5px ${INTER}`, color: "#8b8b93", display: "flex", alignItems: "center", gap: 14 }}>
           {status === "error" && <span style={{ color: "#f97316" }}>{statusMsg}</span>}
           {status === "loading" && (
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
@@ -613,10 +630,13 @@ export default function DJNextApp() {
               <span style={{ color: "#60a5fa", cursor: "pointer" }} onClick={resetPlayed}>reset played</span>
             </>
           )}
+          <Link href="/" className="djs-lk" title="lucaskrippendorff.com" aria-label="lucaskrippendorff.com">
+            <img src="/assets/img/lk-black-bone-r90-180.png" alt="LK" />
+          </Link>
         </div>
       </div>
 
-      {showPanes && (
+      {(showPanes || idle) && (
         <>
           {/* Set-timeline rail */}
           <div style={{ ...S.panel, margin: "16px 22px 0", padding: "14px 16px", overflow: "hidden" }}>
@@ -636,7 +656,9 @@ export default function DJNextApp() {
             </div>
             {rail || (
               <div style={{ border: "1px dashed #2c2c31", padding: "28px 18px", textAlign: "center", color: "#55555c", font: `400 10.5px ${MONO}` }}>
-                pick a track from the library to start your set
+                {idle
+                  ? "your set builds here: the last three tracks you played, what is live now, and what could come next"
+                  : "pick a track from the library to start your set"}
               </div>
             )}
           </div>
@@ -672,6 +694,14 @@ export default function DJNextApp() {
                 </div>
               </div>
               <div ref={libScrollRef} style={{ maxHeight: 436, overflowY: "auto" }}>
+                {idle && (
+                  <div>
+                    {skeletonRows(8, "libskel")}
+                    <div style={{ padding: "14px", textAlign: "center", color: "#55555c", font: `400 10.5px ${MONO}` }}>
+                      every track gets a key and BPM
+                    </div>
+                  </div>
+                )}
                 <div style={{ position: "relative" }}>
                   {/* spotlight bar */}
                   <div
@@ -795,8 +825,25 @@ export default function DJNextApp() {
                   )}
                 </>
               ) : (
-                <div style={{ ...S.panel, padding: "28px 18px", textAlign: "center", color: "#55555c", font: `400 10.5px ${MONO}` }}>
-                  suggestions appear here once a track is playing
+                <div>
+                  <div style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, padding: "0 12px 8px", font: `600 10px ${INTER}`, letterSpacing: 1.2, color: "#8b8b93" }}>
+                    <div>#</div><div>TRACK</div><div>KEY</div><div>BPM</div><div>NOTE</div><div style={{ textAlign: "right" }}>SCORE</div>
+                  </div>
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <div key={`sugskel${i}`} style={{ display: "grid", gridTemplateColumns: "28px 1fr 52px 52px 150px 110px", gap: 10, alignItems: "center", padding: "12px 12px", borderTop: "1px solid #1c1c20" }}>
+                      <span style={{ font: `500 12px 'JetBrains Mono',monospace`, color: "#2c2c31" }}>{i + 1}</span>
+                      <span style={{ height: 8, width: `${52 + ((i * 23) % 40)}%`, background: "#1c1c20" }} />
+                      <span style={{ height: 14, width: 34, background: "#16161b" }} />
+                      <span style={{ height: 14, width: 34, background: "#16161b" }} />
+                      <span style={{ height: 8, width: "60%", background: "#16161b" }} />
+                      <span style={{ display: "flex", justifyContent: "flex-end" }}><span style={{ height: 6, width: 64, background: "#1c1c20" }} /></span>
+                    </div>
+                  ))}
+                  <div style={{ padding: "16px 12px", textAlign: "center", color: "#55555c", font: `400 10.5px 'JetBrains Mono',monospace` }}>
+                    {idle
+                      ? "paste a playlist link above: whatever you set as now playing ranks everything else by key and BPM"
+                      : "suggestions appear here once a track is playing"}
+                  </div>
                 </div>
               )}
             </div>
