@@ -69,17 +69,6 @@ function scrollToSection(id: string) {
 
 const folders: FolderItem[] = [
   {
-    label: "DJNext",
-    path: "/djnext",
-    sections: [
-      { label: "Overview", id: "" },
-      { label: "Why This Project?", id: "why-this-project" },
-      { label: "How Ranking Works", id: "how-ranking-works" },
-      { label: "The Data Problem", id: "the-data-problem" },
-      { label: "What I Took From It", id: "what-i-took-from-it" },
-    ],
-  },
-  {
     label: "USB-C Speaker",
     path: "/speaker",
     sections: [
@@ -163,6 +152,17 @@ const folders: FolderItem[] = [
       { label: "What I Built", id: "what-i-built" },
       { label: "Design Highlights", id: "design-highlights" },
       { label: "My Role", id: "my-role" },
+    ],
+  },
+  {
+    label: "DJNext",
+    path: "/djnext",
+    sections: [
+      { label: "Overview", id: "" },
+      { label: "About DJNext", id: "about-djnext" },
+      { label: "How It Ranks", id: "how-it-ranks" },
+      { label: "Getting the Data", id: "getting-the-data" },
+      { label: "From Localhost to Here", id: "from-localhost" },
     ],
   },
   {
