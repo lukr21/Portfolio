@@ -166,6 +166,37 @@ export default function HomePage() {
         <div className="projects-grid">
           <ScrollReveal>
             <ProjectCardTilt className="project-card">
+              <Link href="/djnext" style={{ display: "contents" }}>
+                <div className="project-card__img-wrap">
+                  <div className="project-card__img project-card__img--djnext">
+                    <img
+                      src="/assets/img/djnext-logo.png"
+                      alt="DJNext wordmark with the twelve Camelot wheel colors"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="project-card__overlay" />
+                </div>
+                <div className="project-card__body">
+                  <p className="project-card__tag">
+                    Personal Project &middot; 2026 &middot; Live App
+                  </p>
+                  <h3 className="project-card__title">DJNext</h3>
+                  <p className="project-card__excerpt">
+                    A next-track suggester for DJing off TIDAL. Paste a playlist
+                    link and every track gets a Camelot key and BPM, from music
+                    databases or signal analysis running in your browser, then
+                    ranked live against whatever is playing. Try it with your
+                    own playlist.
+                  </p>
+                </div>
+                <span className="project-card__arrow">&rarr;</span>
+              </Link>
+            </ProjectCardTilt>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <ProjectCardTilt className="project-card">
               <Link href="/speaker" style={{ display: "contents" }}>
                 <div className="project-card__img-wrap">
                   <img

@@ -3,7 +3,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { pageMetadata } from "@/components/meta";
 
 export const metadata = pageMetadata(
-  "djnext",
+  "DJNext",
   "A local web app that suggests the next track to mix from a Tidal playlist, ranking every candidate by Camelot key compatibility and BPM proximity. Python 3, standard library only.",
   "/djnext",
   "/assets/img/djnext_ui.png"
@@ -18,7 +18,7 @@ export default function DjnextPage() {
           &larr; Back to Projects
         </Link>
         <p className="project-hero__tag">Personal project &middot; August 2026</p>
-        <h1 className="project-hero__title">djnext</h1>
+        <h1 className="project-hero__title">DJNext</h1>
         <p className="project-hero__subtitle">
           A local web app that reads my Tidal playlist and tells me what to play
           next. Every track in the library gets scored against whatever is
@@ -26,6 +26,11 @@ export default function DjnextPage() {
           wheel and how far the tempo has to stretch, and the list re-ranks the
           moment I switch tracks. It runs on localhost, has no build step, and
           depends on nothing outside the Python standard library.
+        </p>
+        <p style={{ marginTop: "1.25rem" }}>
+          <Link href="/djnext/app" className="djx-btn djx-btn--primary" style={{ textDecoration: "none", display: "inline-block" }}>
+            Open DJNext &rarr;
+          </Link>
         </p>
         <div className="project-hero__meta">
           <div className="meta-item">
@@ -55,7 +60,7 @@ export default function DjnextPage() {
           until the moment it does not.
         </ScrollReveal>
         <ScrollReveal tag="p">
-          djnext does the bookkeeping instead. I export the playlist to CSV,
+          DJNext does the bookkeeping instead. I export the playlist to CSV,
           it looks up tempo and key for every track once and caches the result,
           and from then on it is a ranked list that updates as the set moves.
           The whole thing is one Python file serving a single HTML page, so
@@ -66,7 +71,7 @@ export default function DjnextPage() {
           <div className="media-block media-block--full-width">
             <img
               src="/assets/img/djnext_ui.png"
-              alt="djnext interface showing Strobe by deadmau5 as the current track, with seven candidates ranked below by key and BPM"
+              alt="DJNext interface showing Strobe by deadmau5 as the current track, with seven candidates ranked below by key and BPM"
             />
             <div className="media-block__caption">
               Playing Strobe (10A, 128 BPM). Midnight City ranks first at 11A

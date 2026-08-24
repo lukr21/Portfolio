@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import CopyEmail from "@/components/CopyEmail";
+import ThemeToggle from "@/components/ThemeToggle";
 
 interface Section {
   label: string;
@@ -67,6 +68,17 @@ function scrollToSection(id: string) {
 }
 
 const folders: FolderItem[] = [
+  {
+    label: "DJNext",
+    path: "/djnext",
+    sections: [
+      { label: "Overview", id: "" },
+      { label: "Why This Project?", id: "why-this-project" },
+      { label: "How Ranking Works", id: "how-ranking-works" },
+      { label: "The Data Problem", id: "the-data-problem" },
+      { label: "What I Took From It", id: "what-i-took-from-it" },
+    ],
+  },
   {
     label: "USB-C Speaker",
     path: "/speaker",
@@ -438,6 +450,9 @@ function FolderTree({
 function SocialFooter() {
   return (
     <div className="side-nav__footer">
+      <div style={{ flexBasis: "100%" }}>
+        <ThemeToggle />
+      </div>
       <a
         href="https://www.linkedin.com/in/lucas-krippendorff"
         target="_blank"
