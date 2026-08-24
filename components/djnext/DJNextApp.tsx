@@ -489,7 +489,7 @@ export default function DJNextApp() {
       const prevT = dj.history.length ? byId(dj.history[dj.history.length - 1]) : null;
       const half: CSSProperties = { ...S.slot, width: "auto", flex: 1, minWidth: 0 };
       return (
-        <div style={{ display: "flex", border: "1px solid #232326", background: "#0f0f11", overflow: "hidden" }}>
+        <div key={`mrail-${dj.nowId}`} style={{ display: "flex", border: "1px solid #232326", background: "#0f0f11", overflow: "hidden", animation: `djIn .38s ${EASE} both` }}>
           {prevT ? (
             <div style={half}>
               <div style={{ opacity: 0.6, minWidth: 0 }}>
@@ -642,7 +642,7 @@ export default function DJNextApp() {
             onChange={(e) => setPlaylistUrl(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && loadPlaylist()}
             placeholder="https://tidal.com/playlist/… (public or unlisted)"
-            style={{ flex: 1, background: "#111113", border: "1px solid #232326", borderRadius: 0, padding: "9px 14px", font: `400 12.5px ${MONO}`, color: "#f4f4f5", outline: "none", minWidth: 0 }}
+            style={{ flex: 1, background: "#111113", border: "1px solid #232326", borderRadius: 0, padding: "9px 14px", font: `400 ${isMobile ? "16px" : "12.5px"} ${MONO}`, color: "#f4f4f5", outline: "none", minWidth: 0 }}
           />
           <button
             onClick={loadPlaylist}
@@ -739,7 +739,7 @@ export default function DJNextApp() {
                     if (e.key === "Enter" && filt.length) pick(filt[0].id);
                   }}
                   placeholder="Search… (⏎ = now playing)"
-                  style={{ width: "100%", boxSizing: "border-box", background: "#0a0a0a", border: "1px solid #232326", borderRadius: 0, padding: "7px 10px", font: `400 12px ${INTER}`, color: "#f4f4f5", outline: "none" }}
+                  style={{ width: "100%", boxSizing: "border-box", background: "#0a0a0a", border: "1px solid #232326", borderRadius: 0, padding: "7px 10px", font: `400 ${isMobile ? "16px" : "12px"} ${INTER}`, color: "#f4f4f5", outline: "none" }}
                 />
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px", borderBottom: "1px solid #1c1c20", font: `600 9px ${INTER}`, letterSpacing: 1.2, color: "#55555c" }}>
@@ -756,7 +756,7 @@ export default function DJNextApp() {
                   ))}
                 </div>
               </div>
-              <div ref={libScrollRef} style={{ maxHeight: isMobile ? 340 : 436, overflowY: "auto", display: isMobile && !libOpen ? "none" : undefined }}>
+              <div ref={libScrollRef} style={{ maxHeight: isMobile ? 340 : 436, overflowY: "auto", display: isMobile && !libOpen ? "none" : undefined, animation: isMobile && libOpen ? "djFade .3s ease both" : undefined }}>
                 {isMobile &&
                   filt.map((t) => (
                     <div
