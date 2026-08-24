@@ -82,6 +82,33 @@ export default function DJNextPage() {
           actually mixes with.
         </ScrollReveal>
 
+        <ScrollReveal>
+          <div className="equation">
+            <div className="equation__main">
+              score = <em>w</em> &middot; K + (1 &minus; <em>w</em>) &middot; T
+            </div>
+            <div className="equation__defs">
+              <div>
+                <span className="equation__var">K</span> key: same 1.0 &middot;
+                &plusmn;1 hour 0.9 &middot; relative 0.85 &middot; energy
+                diagonal 0.65 &middot; &plusmn;2 hours 0.55 &middot; parallel
+                0.4 &middot; clash 0
+              </div>
+              <div>
+                <span className="equation__var">T</span> tempo, from
+                |&Delta;BPM| in percent (best of &times;&frac12;, &times;1,
+                &times;2): &le;3% &rarr; 1.0&ndash;0.85 &middot; 3&ndash;6%
+                &rarr; 0.85&ndash;0.4 &middot; 6&ndash;8% &rarr;
+                0.4&ndash;0 &middot; &gt;8% hidden
+              </div>
+              <div>
+                <span className="equation__var">w</span> key weight, 0.6 by
+                default &middot; played tracks: score &times; 0.5
+              </div>
+            </div>
+          </div>
+        </ScrollReveal>
+
         <ScrollReveal tag="h2" id="getting-the-data">Getting the Data</ScrollReveal>
         <ScrollReveal tag="p">
           The hard part is that TIDAL shows BPM and key in its own apps but does
@@ -106,12 +133,12 @@ export default function DJNextPage() {
         <ScrollReveal>
           <div className="media-block">
             <img
-              src="/assets/img/djnext_ui.png"
-              alt="The first localhost version of DJNext, showing ranked suggestions for a playing track"
+              src="/assets/img/djnext_set_view.png"
+              alt="The DJNext set view: timeline rail of played tracks, library with key colors, and ranked suggestions"
             />
             <div className="media-block__caption">
-              The first version: one Python file, standard library only, running
-              on localhost
+              The set view: three tracks into a set, with the library sorted by
+              BPM and the next candidates ranked live
             </div>
           </div>
         </ScrollReveal>
