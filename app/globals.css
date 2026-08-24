@@ -1978,3 +1978,4 @@ body:has(.djs-page) .mobile-dropdown { transform: translateY(-110%); }
 @keyframes djFade2 { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 /* mobile rail conveyor: 3 slots in a 150%-wide track, slide one slot left */
 @keyframes djRailM { from { transform: none; } to { transform: translateX(-33.3333%); } }
+@keyframes djRailMBack { from { transform: translateX(-33.3333%); } to { transform: none; } }

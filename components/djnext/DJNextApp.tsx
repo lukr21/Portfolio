@@ -527,6 +527,33 @@ export default function DJNextApp() {
       }
       const half: CSSProperties = { ...S.slot, width: "auto", flex: "0 0 50%", minWidth: 0 };
       const prevT = dj.history.length ? byId(dj.history[dj.history.length - 1]) : null;
+      if (dj.slideBack && nowT) {
+        // reverse conveyor: undone track slides off right, restored pair returns from the left
+        const third: CSSProperties = { ...S.slot, width: "auto", flex: "0 0 33.3333%", minWidth: 0 };
+        const undone = dj.hoverId ? byId(dj.hoverId) : null;
+        return (
+          <div style={{ border: "1px solid #232326", background: "#0f0f11", overflow: "hidden" }}>
+            <div
+              key={`mback-${dj.epoch}`}
+              style={{ display: "flex", width: "150%", animation: `djRailMBack .38s ${EASE} forwards` }}
+              onAnimationEnd={(ev) => { if (ev.animationName === "djRailMBack") setDj((s) => ({ ...s, slideBack: false })); }}
+            >
+              {prevSlotEl(prevT, third, 0.6)}
+              {nowSlotEl(nowT, third)}
+              {undone ? (
+                <div style={{ ...third, borderRight: "none" }}>
+                  <div style={{ opacity: 0.55, minWidth: 0 }}>
+                    <SlotTag text="UNDONE" color="#8b8b93" />
+                    <SlotLines t={undone} />
+                  </div>
+                </div>
+              ) : (
+                <div style={{ ...third, borderRight: "none", display: "flex", alignItems: "center", justifyContent: "center", color: "#2c2c31", font: `400 12px ${MONO}` }}>—</div>
+              )}
+            </div>
+          </div>
+        );
+      }
       return (
         <div style={{ border: "1px solid #232326", background: "#0f0f11", overflow: "hidden" }}>
           <div style={{ display: "flex" }}>
