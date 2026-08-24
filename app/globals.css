@@ -1910,12 +1910,12 @@ body {
 
 /* Entering DJNext: the site chrome slides away and the tool takes the room.
    Driven purely by the app page being in the DOM. */
-.main { transition: margin-left var(--transition); }
+.main { transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 body:has(.djs-page) .side-nav { transform: translateX(-100%); }
 body:has(.djs-page) .main { margin-left: 0; }
 body:has(.djs-page) .mobile-bar,
 body:has(.djs-page) .mobile-dropdown { transform: translateY(-110%); }
-.mobile-bar, .mobile-dropdown { transition: transform var(--transition); }
+.mobile-bar, .mobile-dropdown { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 .djs-page { animation: djsFadeIn 0.45s ease both; }
 @keyframes djsFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
