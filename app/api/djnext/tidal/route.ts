@@ -66,9 +66,11 @@ export async function GET(req: NextRequest) {
     const metaJson = await meta.json();
     const name = metaJson.data?.attributes?.name || "Playlist";
 
-    const tracks: { id: string; title: string; artist: string; isrc: string }[] = [];
+    const tracks: { id: string; title: string; artist: string; isrc: string; cover: string | null }[] = [];
     const artists: Record<string, string> = {};
-    let url: string | null = `${BASE}/playlists/${uuid}/relationships/items?include=items,items.artists&countryCode=US`;
+    const artworks: Record<string, string> = {};  // artworkId -> small image href
+    const albumArt: Record<string, string> = {};  // albumId -> artworkId
+    let url: string | null = `${BASE}/playlists/${uuid}/relationships/items?include=items,items.artists,items.albums,items.albums.coverArt&countryCode=US`;
     let pages = 0;
     while (url && pages < MAX_PAGES) {
       const r = await tidalGet(url, token);
@@ -78,14 +80,24 @@ export async function GET(req: NextRequest) {
       for (const inc of d.included || []) {
         if (inc.type === "artists") artists[inc.id] = inc.attributes?.name || "";
         else if (inc.type === "tracks") trackRes[inc.id] = inc;
+        else if (inc.type === "albums") {
+          const ca = inc.relationships?.coverArt?.data?.[0]?.id;
+          if (ca) albumArt[inc.id] = ca;
+        } else if (inc.type === "artworks") {
+          const files: { href?: string; meta?: { width?: number } }[] = inc.attributes?.files || [];
+          const small = [...files].sort((a, b) => (a.meta?.width || 9999) - (b.meta?.width || 9999)).find((f) => (f.meta?.width || 0) >= 80) || files[0];
+          if (small?.href) artworks[inc.id] = small.href;
+        }
       }
       for (const ident of d.data || []) {
-        const tr = trackRes[ident.id] as { attributes?: { title?: string; isrc?: string }; relationships?: { artists?: { data?: { id: string }[] } } } | undefined;
+        const tr = trackRes[ident.id] as { attributes?: { title?: string; isrc?: string }; relationships?: { artists?: { data?: { id: string }[] }; albums?: { data?: { id: string }[] } } } | undefined;
         if (!tr) continue;
         const ids = tr.relationships?.artists?.data?.map((x) => x.id) || [];
         const names = ids.map((i) => artists[i]).filter(Boolean).join(", ");
+        const albumId = tr.relationships?.albums?.data?.[0]?.id;
+        const cover = (albumId && artworks[albumArt[albumId]]) || null;
         if (tr.attributes?.title && names) {
-          tracks.push({ id: `${ident.id}-${tracks.length}`, title: tr.attributes.title, artist: names, isrc: tr.attributes.isrc || "" });
+          tracks.push({ id: `${ident.id}-${tracks.length}`, title: tr.attributes.title, artist: names, isrc: tr.attributes.isrc || "", cover });
         }
       }
       const nxt = d.links?.next;

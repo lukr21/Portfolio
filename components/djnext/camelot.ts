@@ -73,6 +73,7 @@ export interface Track {
   isrc: string;
   bpm: number | null;
   camelot: string | null;
+  cover?: string | null;
   source?: string;
   played?: boolean;
 }

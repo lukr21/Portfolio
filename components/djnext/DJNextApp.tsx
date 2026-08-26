@@ -182,6 +182,14 @@ function keyBg(camelot: string | null): string {
   return h === null ? "rgba(139,139,147,.14)" : `hsl(${h} 75% 55% / .14)`;
 }
 
+function Cover({ src, size }: { src?: string | null; size: number }) {
+  return src ? (
+    <img src={src} alt="" width={size} height={size} loading="lazy" style={{ width: size, height: size, objectFit: "cover", flex: "none", display: "block", background: "#1c1c20" }} />
+  ) : (
+    <span style={{ width: size, height: size, flex: "none", display: "block", background: "#1c1c20" }} />
+  );
+}
+
 // shared inline-style fragments (handoff tokens)
 const S = {
   panel: { background: "#111113", border: "1px solid #232326", borderRadius: 0 } as CSSProperties,
@@ -194,14 +202,17 @@ const S = {
 
 function SlotLines({ t }: { t: Track }) {
   return (
-    <>
-      <div style={{ font: `600 12.5px ${INTER}`, color: "#f4f4f5", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.title}</div>
-      <div style={{ font: `400 11px ${INTER}`, color: "#8b8b93", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", margin: "2px 0 6px" }}>{t.artist}</div>
-      <div style={{ display: "flex", gap: 5 }}>
-        <span style={{ ...S.keyPill, background: keyBg(t.camelot), color: keyText(t.camelot), font: `600 10px ${MONO}`, padding: "1px 7px" }}>{t.camelot || "?"}</span>
-        <span style={{ ...S.bpmPill, font: `600 10px ${MONO}`, padding: "1px 7px" }}><BpmText bpm={t.bpm} color="#f4f4f5" /></span>
+    <div style={{ display: "flex", gap: 10, minWidth: 0, alignItems: "center" }}>
+      <Cover src={t.cover} size={44} />
+      <div style={{ minWidth: 0, flex: 1 }}>
+        <div style={{ font: `600 12.5px ${INTER}`, color: "#f4f4f5", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{t.title}</div>
+        <div style={{ font: `400 11px ${INTER}`, color: "#8b8b93", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", margin: "2px 0 6px" }}>{t.artist}</div>
+        <div style={{ display: "flex", gap: 5 }}>
+          <span style={{ ...S.keyPill, background: keyBg(t.camelot), color: keyText(t.camelot), font: `600 10px ${MONO}`, padding: "1px 7px" }}>{t.camelot || "?"}</span>
+          <span style={{ font: `600 10px ${MONO}` }}><BpmText bpm={t.bpm} color="#f4f4f5" /></span>
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -280,7 +291,7 @@ export default function DJNextApp() {
       let savedPlayed: Record<string, 1> = {};
       try { savedPlayed = JSON.parse(localStorage.getItem(`djnext-played-${uuid}`) || "{}"); } catch { /* fresh */ }
       const cache = loadCache();
-      const loaded: Track[] = d.tracks.map((t: { id: string; title: string; artist: string; isrc: string }) => {
+      const loaded: Track[] = d.tracks.map((t: { id: string; title: string; artist: string; isrc: string; cover?: string | null }) => {
         const c = cache[trackKey(t)];
         return { ...t, bpm: c?.bpm ?? null, camelot: c?.camelot ?? null, source: c?.source, played: false };
       });
@@ -771,30 +782,52 @@ export default function DJNextApp() {
           {/* Panes */}
           <div style={{ display: "flex", gap: isMobile ? 12 : 16, padding: isMobile ? "14px 14px 18px" : "16px 22px 22px", alignItems: "flex-start", flexWrap: "wrap" }}>
             {/* Library */}
-            <div style={{ ...S.panel, width: isMobile ? "100%" : 330, flex: "none", overflow: "hidden" }}>
-              <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid #232326" }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <div style={S.label}>LIBRARY</div>
-                  {isMobile && (
-                    <button
-                      onClick={() => setLibOpen((o) => !o)}
-                      style={{ background: "#1a1a1e", border: "1px solid #2c2c31", borderRadius: 0, color: "#8b8b93", font: `500 10px ${MONO}`, padding: "3px 9px", cursor: "pointer" }}
-                    >
-                      {libOpen ? "collapse ▲" : `expand${filt.length ? ` (${filt.length})` : ""} ▼`}
-                    </button>
-                  )}
+            <div style={{ width: isMobile ? "100%" : 330, flex: "none", ...(isMobile ? {} : { ...S.panel, overflow: "hidden" }) }}>
+              {isMobile ? (
+                <div style={{ display: "flex", gap: 8 }}>
+                  <input
+                    value={dj.q}
+                    onChange={(e) => setDj((s) => ({ ...s, q: e.target.value }))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && filt.length) pick(filt[0].id);
+                    }}
+                    placeholder="Search the library…"
+                    style={{ flex: 1, minWidth: 0, height: 42, boxSizing: "border-box", background: "#111113", border: "1px solid #232326", borderRadius: 0, padding: "0 12px", font: `400 16px ${INTER}`, color: "#f4f4f5", outline: "none" }}
+                  />
+                  <button
+                    onClick={() => filt.length && pick(filt[0].id)}
+                    aria-label="Play top search match"
+                    style={{ width: 42, height: 42, flex: "none", background: "#111113", border: "1px solid #232326", borderRadius: 0, color: "#8b8b93", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center" }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                      <circle cx="11" cy="11" r="7" />
+                      <path d="M21 21l-4.3-4.3" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setLibOpen((o) => !o)}
+                    aria-label={libOpen ? "Collapse library" : "Expand library"}
+                    style={{ width: 42, height: 42, flex: "none", background: libOpen ? "#26262b" : "#111113", border: "1px solid #232326", borderRadius: 0, color: "#8b8b93", cursor: "pointer", font: `500 12px ${MONO}` }}
+                  >
+                    {libOpen ? "▲" : "▼"}
+                  </button>
                 </div>
-                <input
-                  value={dj.q}
-                  onChange={(e) => setDj((s) => ({ ...s, q: e.target.value }))}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" && filt.length) pick(filt[0].id);
-                  }}
-                  placeholder="Search… (⏎ = now playing)"
-                  style={{ width: "100%", boxSizing: "border-box", background: "#0a0a0a", border: "1px solid #232326", borderRadius: 0, padding: "7px 10px", font: `400 ${isMobile ? "16px" : "12px"} ${INTER}`, color: "#f4f4f5", outline: "none" }}
-                />
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px", borderBottom: "1px solid #1c1c20", font: `600 9px ${INTER}`, letterSpacing: 1.2, color: "#55555c" }}>
+              ) : (
+                <div style={{ padding: "12px 14px 10px", borderBottom: "1px solid #232326" }}>
+                  <div style={{ ...S.label, marginBottom: 8 }}>LIBRARY</div>
+                  <input
+                    value={dj.q}
+                    onChange={(e) => setDj((s) => ({ ...s, q: e.target.value }))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && filt.length) pick(filt[0].id);
+                    }}
+                    placeholder="Search… (⏎ = now playing)"
+                    style={{ width: "100%", boxSizing: "border-box", background: "#0a0a0a", border: "1px solid #232326", borderRadius: 0, padding: "7px 10px", font: `400 12px ${INTER}`, color: "#f4f4f5", outline: "none" }}
+                  />
+                </div>
+              )}
+              {isMobile && !libOpen ? null : (
+              <div style={{ ...(isMobile ? { border: "1px solid #232326", borderBottom: "none", marginTop: 8 } : {}), display: "flex", justifyContent: "space-between", alignItems: "center", padding: "6px 14px", borderBottom: "1px solid #1c1c20", font: `600 9px ${INTER}`, letterSpacing: 1.2, color: "#55555c" }}>
                 <div>TRACK</div>
                 <div style={{ display: "flex", gap: 8, font: `500 10px ${MONO}` }}>
                   {(["key", "bpm"] as const).map((by) => (
@@ -808,20 +841,24 @@ export default function DJNextApp() {
                   ))}
                 </div>
               </div>
-              <div ref={libScrollRef} style={{ maxHeight: isMobile ? 340 : 436, overflowY: "auto", display: isMobile && !libOpen ? "none" : undefined, animation: isMobile && libOpen ? "djFade .3s ease both" : undefined }}>
+              )}
+              <div ref={libScrollRef} style={{ maxHeight: isMobile ? 340 : 436, overflowY: "auto", display: isMobile && !libOpen ? "none" : undefined, animation: isMobile && libOpen ? "djFade .3s ease both" : undefined, ...(isMobile ? { border: "1px solid #232326", borderTop: "none", background: "#111113" } : {}) }}>
                 {isMobile &&
                   filt.map((t) => (
                     <div
                       key={t.id}
                       onClick={() => pick(t.id)}
-                      style={{ padding: "9px 14px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: t.id === dj.nowId ? "rgba(59,130,246,.12)" : "transparent", boxShadow: t.id === dj.nowId ? "inset 2px 0 0 #3b82f6" : "none", opacity: dj.played[t.id] && t.id !== dj.nowId ? 0.45 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: t.id === dj.nowId ? "rgba(59,130,246,.12)" : "transparent", boxShadow: t.id === dj.nowId ? "inset 2px 0 0 #3b82f6" : "none", opacity: dj.played[t.id] && t.id !== dj.nowId ? 0.45 : 1 }}
                     >
-                      <div style={{ font: `500 13px ${INTER}`, color: "#d4d4d8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {t.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{t.artist}</span>
-                      </div>
-                      <div style={{ marginTop: 3, font: `500 11px ${MONO}` }}>
-                        <span style={{ color: keyText(t.camelot) }}>{t.camelot || "?"}</span>{" "}
-                        <BpmText bpm={t.bpm} color="#f4f4f5" />
+                      <Cover src={t.cover} size={36} />
+                      <div style={{ minWidth: 0, flex: 1 }}>
+                        <div style={{ font: `500 13px ${INTER}`, color: "#d4d4d8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                          {t.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{t.artist}</span>
+                        </div>
+                        <div style={{ marginTop: 4, display: "flex", alignItems: "center", gap: 8 }}>
+                          <span style={{ ...S.keyPill, background: keyBg(t.camelot), color: keyText(t.camelot), font: `600 10px ${MONO}`, padding: "1px 7px" }}>{t.camelot || "?"}</span>
+                          <span style={{ font: `600 11px ${MONO}` }}><BpmText bpm={t.bpm} color="#f4f4f5" /></span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -849,13 +886,14 @@ export default function DJNextApp() {
                       onClick={() => pick(t.id)}
                       onMouseEnter={() => hoverOn(t.id)}
                       onMouseLeave={() => hoverOff(t.id)}
-                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, height: ROW_H, boxSizing: "border-box", padding: "0 14px", cursor: "pointer", opacity: dj.played[t.id] && t.id !== dj.nowId ? 0.45 : 1 }}
+                      style={{ display: "flex", alignItems: "center", gap: 10, height: ROW_H, boxSizing: "border-box", padding: "0 14px", cursor: "pointer", opacity: dj.played[t.id] && t.id !== dj.nowId ? 0.45 : 1 }}
                     >
+                      <Cover src={t.cover} size={26} />
                       <div style={{ font: `500 12.5px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0, flex: 1, color: "#d4d4d8" }}>
                         {t.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{t.artist}</span>
                       </div>
-                      <div style={{ font: `500 11px ${MONO}`, flex: "none" }}>
-                        <span style={{ color: keyText(t.camelot) }}>{t.camelot || "?"}</span>{" "}
+                      <div style={{ font: `500 11px ${MONO}`, flex: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ ...S.keyPill, background: keyBg(t.camelot), color: keyText(t.camelot), font: `600 10px ${MONO}`, padding: "1px 7px" }}>{t.camelot || "?"}</span>
                         <BpmText bpm={t.bpm} color="#f4f4f5" />
                       </div>
                     </div>
@@ -869,12 +907,13 @@ export default function DJNextApp() {
                     }}
                   >
                     {filt.map((t) => (
-                      <div key={t.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 8, height: ROW_H, boxSizing: "border-box", padding: "0 14px" }}>
+                      <div key={t.id} style={{ display: "flex", alignItems: "center", gap: 10, height: ROW_H, boxSizing: "border-box", padding: "0 14px" }}>
+                        <Cover src={t.cover} size={26} />
                         <div style={{ font: `500 12.5px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0, flex: 1, color: "#ffffff" }}>
                           {t.title} <span style={{ color: "#c3d9ff", fontWeight: 400 }}>{t.artist}</span>
                         </div>
-                        <div style={{ font: `600 11px ${MONO}`, flex: "none" }}>
-                          <span style={{ color: keyText(t.camelot) }}>{t.camelot || "?"}</span>{" "}
+                        <div style={{ font: `600 11px ${MONO}`, flex: "none", display: "flex", alignItems: "center", gap: 6 }}>
+                          <span style={{ ...S.keyPill, background: keyBg(t.camelot), color: keyText(t.camelot), font: `600 10px ${MONO}`, padding: "1px 7px" }}>{t.camelot || "?"}</span>
                           <BpmText bpm={t.bpm} color="#ffffff" />
                         </div>
                       </div>
@@ -927,18 +966,23 @@ export default function DJNextApp() {
                           onClick={() => pick(s.id)}
                           style={{ padding: "10px 12px", borderTop: "1px solid #1c1c20", cursor: "pointer", background: boost ? "rgba(249,115,22,.05)" : "transparent", opacity: s.played ? 0.55 : 1, animation: changed[i] ? `${dj.epoch % 2 ? "djFade2" : "djFade"} .38s ${EASE} both` : "none" }}
                         >
+                          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <Cover src={s.cover} size={40} />
+                          <div style={{ minWidth: 0, flex: 1 }}>
                           <div style={{ font: `500 13px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             <span style={{ font: `500 11px ${MONO}`, color: "#55555c" }}>{i + 1}</span>{" "}
                             {s.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{s.artist}</span>
                           </div>
                           <div style={{ marginTop: 6, display: "flex", alignItems: "center", gap: 8 }}>
                             <span style={{ ...S.keyPill, background: keyBg(s.camelot), color: keyText(s.camelot) }}>{s.camelot || "?"}</span>
-                            <span style={S.bpmPill}><BpmText bpm={s.bpm} color="#f4f4f5" /></span>
+                            <span style={{ font: `600 11px ${MONO}` }}><BpmText bpm={s.bpm} color="#f4f4f5" /></span>
                             <span style={{ flex: 1 }} />
                             <span style={{ font: `500 10.5px ${MONO}`, color: "#8b8b93" }}>{s.score.toFixed(2)}</span>
                             <span style={{ width: 56, height: 6, background: "#1c1c20", overflow: "hidden", display: "inline-block" }}>
                               <span style={{ display: "block", width: `${Math.round(Math.min(1, s.score) * 100)}%`, height: 6, background: boost ? "linear-gradient(90deg,#f97316,#f9a03f)" : "linear-gradient(90deg,#3b82f6,#22c55e)" }} />
                             </span>
+                          </div>
+                          </div>
                           </div>
                         </div>
                       );
@@ -958,13 +1002,14 @@ export default function DJNextApp() {
                         }}
                       >
                         <div style={{ font: `500 12px ${MONO}`, color: "#55555c" }}>{i + 1}</div>
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ font: `500 13px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        <div style={{ minWidth: 0, display: "flex", alignItems: "center", gap: 10 }}>
+                          <Cover src={s.cover} size={30} />
+                          <div style={{ font: `500 13px ${INTER}`, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", minWidth: 0 }}>
                             {s.title} <span style={{ color: "#8b8b93", fontWeight: 400 }}>{s.artist}</span>
                           </div>
                         </div>
                         <div><span style={{ ...S.keyPill, background: keyBg(s.camelot), color: keyText(s.camelot) }}>{s.camelot || "?"}</span></div>
-                        <div><span style={S.bpmPill}><BpmText bpm={s.bpm} color="#f4f4f5" /></span></div>
+                        <div style={{ font: `600 11px ${MONO}` }}><BpmText bpm={s.bpm} color="#f4f4f5" /></div>
                         <div style={{ font: `400 11.5px ${INTER}`, color: boost ? "#f9a03f" : s.played ? "#55555c" : "#8b8b93", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{note}</div>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
                           <div style={{ font: `500 10.5px ${MONO}`, color: "#8b8b93" }}>{s.score.toFixed(2)}</div>
