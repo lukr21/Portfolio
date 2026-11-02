@@ -164,6 +164,38 @@ export default function HomePage() {
         </ScrollReveal>
 
         <div className="projects-grid">
+          <ScrollReveal className="projects-grid__featured">
+            <ProjectCardTilt className="project-card project-card--featured">
+              <Link href="/subvysion" style={{ display: "contents" }}>
+                <div className="project-card__img-wrap">
+                  <img
+                    src="/assets/img/subvysion_rover_cad.png"
+                    alt="Line drawings of the SubVysion rover with and without its body panels"
+                    className="project-card__img"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="project-card__body">
+                  <p className="project-card__tag">
+                    Experience &middot; SubVysion (YC S26) &middot; 2026 &middot; Ongoing
+                  </p>
+                  <h3 className="project-card__title">
+                    Autonomous GPR Mapping Rover
+                  </h3>
+                  <p className="project-card__excerpt">
+                    As SubVysion&apos;s first engineering hire, I built the
+                    company&apos;s first scanning cart, then designed the
+                    autonomous rover it still runs on today. I led the
+                    mechanical and electrical design, worked from field tests
+                    with our CEO and software intern, and wrote the assembly
+                    guide the whole company used to build one together.
+                  </p>
+                </div>
+                <span className="project-card__arrow">&rarr;</span>
+              </Link>
+            </ProjectCardTilt>
+          </ScrollReveal>
+
           <ScrollReveal>
             <ProjectCardTilt className="project-card">
               <Link href="/speaker" style={{ display: "contents" }}>
@@ -174,7 +206,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -206,7 +237,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -235,7 +265,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -265,7 +294,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -295,7 +323,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">R&amp;D &middot; 2025</p>
@@ -323,7 +350,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -354,7 +380,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -385,7 +410,6 @@ export default function HomePage() {
                       loading="lazy"
                     />
                   </div>
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
@@ -415,7 +439,6 @@ export default function HomePage() {
                     className="project-card__img"
                     loading="lazy"
                   />
-                  <div className="project-card__overlay" />
                 </div>
                 <div className="project-card__body">
                   <p className="project-card__tag">
