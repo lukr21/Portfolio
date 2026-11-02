@@ -1979,3 +1979,18 @@ body:has(.djs-page) .mobile-dropdown { transform: translateY(-110%); }
 /* mobile rail conveyor: 3 slots in a 150%-wide track, slide one slot left */
 @keyframes djRailM { from { transform: none; } to { transform: translateX(-33.3333%); } }
 @keyframes djRailMBack { from { transform: translateX(-33.3333%); } to { transform: none; } }
+
+/* System block diagram (RC car page) */
+.sysdiag { width: 100%; height: auto; display: block; font-family: 'Inter', sans-serif; }
+.sysdiag__frame { fill: none; stroke: var(--border-strong); stroke-width: 1.2; stroke-dasharray: 4 4; }
+.sysdiag__group { fill: var(--text-muted); font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.sysdiag__box rect { fill: var(--surface); stroke: var(--border-strong); stroke-width: 1.2; }
+.sysdiag__box text { fill: var(--text); font-size: 14px; font-weight: 500; }
+.sysdiag__edge--sig, .sysdiag__edge--pwr, .sysdiag__edge--radio { fill: none; stroke-width: 2; }
+.sysdiag__edge--sig { stroke: var(--blue); }
+.sysdiag__edge--radio { stroke: var(--blue); stroke-dasharray: 6 5; }
+.sysdiag__edge--pwr { stroke: var(--orange); }
+.sysdiag__head--sig { fill: var(--blue); }
+.sysdiag__head--pwr { fill: var(--orange); }
+.sysdiag__lbl { fill: var(--text-secondary); font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+.sysdiag__lbl--mid { text-anchor: middle; }

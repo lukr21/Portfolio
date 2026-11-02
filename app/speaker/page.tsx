@@ -174,7 +174,9 @@ export default function SpeakerPage() {
         <ScrollReveal tag="p">
           The board went through four fabbed revisions. JLCPCB assembled the
           SMT parts, so each spin was cheap and fast enough to just order,
-          test, and fix in the next version.
+          test, and fix in the next version. Along the way I cut assembly cost
+          by moving to 0805 parts and picking components that JLCPCB or the
+          Penn lab already stocked.
         </ScrollReveal>
 
         <div className="media-row media-row--grid">

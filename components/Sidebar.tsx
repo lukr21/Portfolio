@@ -69,6 +69,18 @@ function scrollToSection(id: string) {
 
 const folders: FolderItem[] = [
   {
+    label: "SubVysion",
+    path: "/subvysion",
+    sections: [
+      { label: "Overview", id: "" },
+      { label: "Where It Started", id: "where-it-started" },
+      { label: "Field Testing", id: "field-testing" },
+      { label: "Power and Packaging", id: "power-packaging" },
+      { label: "Building It Together", id: "building-together" },
+      { label: "Where It Is Now", id: "now" },
+    ],
+  },
+  {
     label: "USB-C Speaker",
     path: "/speaker",
     sections: [
@@ -78,6 +90,18 @@ const folders: FolderItem[] = [
       { label: "The Amp Board", id: "amp-board" },
       { label: "The Loudness Ladder", id: "loudness-ladder" },
       { label: "Next: The Housing", id: "whats-next" },
+    ],
+  },
+  {
+    label: "Wireless RC Cars",
+    path: "/rc-car",
+    sections: [
+      { label: "Overview", id: "" },
+      { label: "The Idea", id: "the-idea" },
+      { label: "Driving It", id: "driving" },
+      { label: "How It Works", id: "system" },
+      { label: "Getting It to Move", id: "power-problem" },
+      { label: "The IR Tag Game", id: "ir-tag" },
     ],
   },
   {

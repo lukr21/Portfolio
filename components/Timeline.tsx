@@ -12,8 +12,9 @@ export default function Timeline() {
             <a
               key={item.company}
               href={item.href}
-              target="_blank"
-              rel="noopener noreferrer"
+              {...(item.href.startsWith("/")
+                ? {}
+                : { target: "_blank", rel: "noopener noreferrer" })}
               className="timeline__item"
               style={{ ["--i" as string]: i }}
             >

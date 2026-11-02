@@ -9,8 +9,9 @@ export default function ExperienceList() {
         <li key={item.company}>
           <a
             href={item.href}
-            target="_blank"
-            rel="noopener noreferrer"
+            {...(item.href.startsWith("/")
+              ? {}
+              : { target: "_blank", rel: "noopener noreferrer" })}
             className="hero__exp-item"
           >
             <img

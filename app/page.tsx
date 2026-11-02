@@ -198,6 +198,35 @@ export default function HomePage() {
 
           <ScrollReveal>
             <ProjectCardTilt className="project-card">
+              <Link href="/rc-car" style={{ display: "contents" }}>
+                <div className="project-card__img-wrap">
+                  <img
+                    src="/assets/img/rc_car_side.jpg"
+                    alt="RC car rebuilt with an STM32, H-bridge, and breadboard"
+                    className="project-card__img"
+                    loading="lazy"
+                  />
+                  <div className="project-card__overlay" />
+                </div>
+                <div className="project-card__body">
+                  <p className="project-card__tag">
+                    UPenn ESE 3500 &middot; Fall 2026
+                  </p>
+                  <h3 className="project-card__title">Wireless RC Cars</h3>
+                  <p className="project-card__excerpt">
+                    Two kit RC cars rebuilt around STM32s with a homemade
+                    wireless controller. I handled the hardware, including
+                    choosing 9V batteries over AAs to trade runtime for the
+                    power needed to move the car.
+                  </p>
+                </div>
+                <span className="project-card__arrow">&rarr;</span>
+              </Link>
+            </ProjectCardTilt>
+          </ScrollReveal>
+
+          <ScrollReveal>
+            <ProjectCardTilt className="project-card">
               <Link href="/ese-3700" style={{ display: "contents" }}>
                 <div className="project-card__img-wrap">
                   <img
@@ -434,6 +463,12 @@ export default function HomePage() {
               </p>
               <p>
                 {"I don't think of that as settling. If anything, the decision made sense because I realized I didn't have to give anything up. I could anchor my studies in EE while spending my time on projects where electrical, mechanical, and software thinking all have to work together. That's what most of my work reflects."}
+              </p>
+              <p>
+                {"Going forward, I want to keep working on things like robotics, where motors, batteries, and software all have to come together. Getting different systems, and the people who build them, to work with each other is the part I enjoy most."}
+              </p>
+              <p>
+                {"Outside of class I'm in Penn Mars Rover, Penn Aerial Robotics, Penn Outdoors Club, and Penn Astronomy Club. I also DJ and produce music, released as Hazed on Spotify and Apple Music."}
               </p>
             </div>
             <div className="about-links">
