@@ -169,8 +169,8 @@ export default function HomePage() {
               <Link href="/subvysion" style={{ display: "contents" }}>
                 <div className="project-card__img-wrap">
                   <img
-                    src="/assets/img/subvysion_rover_panels.png"
-                    alt="Line drawing of the SubVysion rover with its body panels on"
+                    src="/assets/img/subvysion_team.jpg"
+                    alt="The SubVysion team standing behind the white paneled rover"
                     className="project-card__img"
                     loading="lazy"
                   />
